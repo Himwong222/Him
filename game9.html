@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5賽車挑戰賽</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1000px;
+            width: 100%;
+            gap: 20px;
+        }
+        
+        .game-header {
+            text-align: center;
+            width: 100%;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f59e0b;
+        }
+        
+        .game-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #f59e0b, #ef4444);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .game-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            width: 100%;
+        }
+        
+        .game-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .track-selector {
+            background-color: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+        }
+        
+        .track-selector h2 {
+            color: #f59e0b;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tracks {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .track-option {
+            flex: 1;
+            min-width: 120px;
+            background-color: #334155;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+        
+        .track-option:hover {
+            transform: translateY(-5px);
+            background-color: #475569;
+        }
+        
+        .track-option.active {
+            border-color: #f59e0b;
+            background-color: #475569;
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+        }
+        
+        .track-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #f59e0b;
+        }
+        
+        .track-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .track-desc {
+            font-size: 0.8rem;
+            color: #cbd5e1;
+        }
+        
+        .stats-panel {
+            background-color: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stats-panel h2 {
+            color: #f59e0b;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-box {
+            background-color: #334155;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+        
+        .best-times {
+            background-color: #334155;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        .best-times h3 {
+            color: #10b981;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .time-record {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .time-record:last-child {
+            border-bottom: none;
+        }
+        
+        .time-record .track {
+            font-weight: bold;
+        }
+        
+        .time-record .time {
+            color: #f59e0b;
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+        
+        .game-area {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 3px solid #1e293b;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background-color: #0f172a;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
+        }
+        
+        .instructions {
+            background-color: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .instructions h3 {
+            color: #0ea5e9;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-instructions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .control-group {
+            background-color: #334155;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .control-group h4 {
+            color: #f59e0b;
+            margin-bottom: 10px;
+        }
+        
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .control-item:last-child {
+            border-bottom: none;
+        }
+        
+        .key {
+            background-color: #475569;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            display: none;
+            z-index: 10;
+            border-radius: 15px;
+        }
+        
+        .overlay-content {
+            padding: 40px;
+            background-color: rgba(30, 41, 59, 0.9);
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .overlay-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #f59e0b;
+        }
+        
+        .overlay-content p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: #cbd5e1;
+        }
+        
+        .lap-time {
+            font-size: 3rem;
+            color: #10b981;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        .comparison {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .new-record {
+            color: #f59e0b;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .speedometer {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+        
+        .speed-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f8fafc;
+            font-family: monospace;
+        }
+        
+        .speed-unit {
+            color: #94a3b8;
+        }
+        
+        .lap-counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .lap-counter .current {
+            color: #f59e0b;
+            font-weight: bold;
+        }
+        
+        .lap-counter .total {
+            color: #94a3b8;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .control-instructions {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            #gameCanvas {
+                width: 100%;
+                height: auto;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
+            
+            .tracks {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1><i class="fas fa-flag-checkered"></i> 賽車挑戰賽</h1>
+            <p>選擇賽道，挑戰最佳圈速，成為賽道王者！</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="game-section">
+                <div class="track-selector">
+                    <h2><i class="fas fa-road"></i> 選擇賽道</h2>
+                    <div class="tracks">
+                        <div class="track-option active" data-track="1">
+                            <div class="track-icon"><i class="fas fa-route"></i></div>
+                            <div class="track-name">城市賽道</div>
+                            <div class="track-desc">街道賽，多彎道</div>
+                        </div>
+                        <div class="track-option" data-track="2">
+                            <div class="track-icon"><i class="fas fa-mountain"></i></div>
+                            <div class="track-name">山道狂飆</div>
+                            <div class="track-desc">蜿蜒山路，挑戰極限</div>
+                        </div>
+                        <div class="track-option" data-track="3">
+                            <div class="track-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            <div class="track-name">高速環道</div>
+                            <div class="track-desc">長直線，極速體驗</div>
+                        </div>
+                        <div class="track-option" data-track="4">
+                            <div class="track-icon"><i class="fas fa-circle"></i></div>
+                            <div class="track-name">橢圓賽道</div>
+                            <div class="track-desc">簡單佈局，純粹速度</div>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button id="startButton" class="btn btn-primary">
+                            <i class="fas fa-play"></i> 開始比賽
+                        </button>
+                        <button id="resetButton" class="btn btn-warning">
+                            <i class="fas fa-redo"></i> 重置比賽
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats-panel">
+                    <h2><i class="fas fa-chart-line"></i> 比賽數據</h2>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">當前圈速</div>
+                            <div id="currentTime" class="stat-value">0.000</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">最佳圈速</div>
+                            <div id="bestTime" class="stat-value">0.000</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">最快速度</div>
+                            <div id="topSpeed" class="stat-value">0 km/h</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">當前速度</div>
+                            <div id="currentSpeed" class="stat-value">0 km/h</div>
+                        </div>
+                    </div>
+                    
+                    <div class="best-times">
+                        <h3><i class="fas fa-trophy"></i> 賽道紀錄</h3>
+                        <div id="trackRecords">
+                            <!-- 賽道紀錄將會動態生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="game-section">
+                <div class="game-area">
+                    <canvas id="gameCanvas" width="600" height="500"></canvas>
+                    
+                    <div class="speedometer">
+                        <i class="fas fa-tachometer-alt" style="color: #f59e0b; font-size: 1.5rem;"></i>
+                        <div class="speed-value">0</div>
+                        <div class="speed-unit">km/h</div>
+                    </div>
+                    
+                    <div class="lap-counter">
+                        圈數: <span class="current">0</span>/<span class="total">3</span>
+                    </div>
+                    
+                    <div id="startOverlay" class="game-overlay">
+                        <div class="overlay-content">
+                            <h2>準備開始</h2>
+                            <p>選擇賽道後點擊"開始比賽"</p>
+                            <p>使用方向鍵或WASD控制賽車</p>
+                            <div class="instructions">
+                                <div class="control-item">
+                                    <span>加速</span>
+                                    <span class="key">↑ 或 W</span>
+                                </div>
+                                <div class="control-item">
+                                    <span>剎車/倒車</span>
+                                    <span class="key">↓ 或 S</span>
+                                </div>
+                                <div class="control-item">
+                                    <span>左轉</span>
+                                    <span class="key">← 或 A</span>
+                                </div>
+                                <div class="control-item">
+                                    <span>右轉</span>
+                                    <span class="key">→ 或 D</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="resultsOverlay" class="game-overlay">
+                        <div class="overlay-content">
+                            <h2>比賽完成！</h2>
+                            <p>你已經完成了所有圈數</p>
+                            <div class="lap-time" id="finalTime">0.000</div>
+                            <div id="timeComparison" class="comparison"></div>
+                            <button id="nextRaceButton" class="btn btn-success" style="margin-top: 20px;">
+                                <i class="fas fa-flag-checkered"></i> 再賽一場
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 遊戲說明</h3>
+            <div class="control-instructions">
+                <div class="control-group">
+                    <h4>賽車控制</h4>
+                    <div class="control-item">
+                        <span>加速</span>
+                        <span class="key">↑ 或 W</span>
+                    </div>
+                    <div class="control-item">
+                        <span>剎車/倒車</span>
+                        <span class="key">↓ 或 S</span>
+                    </div>
+                    <div class="control-item">
+                        <span>左轉</span>
+                        <span class="key">← 或 A</span>
+                    </div>
+                    <div class="control-item">
+                        <span>右轉</span>
+                        <span class="key">→ 或 D</span>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <h4>遊戲規則</h4>
+                    <ul style="padding-left: 20px; color: #cbd5e1;">
+                        <li>每場比賽需完成3圈</li>
+                        <li>盡量不要離開賽道，否則會減速</li>
+                        <li>撞到障礙物會大幅減速</li>
+                        <li>挑戰每個賽道的最佳紀錄</li>
+                        <li>完成比賽後可選擇其他賽道</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 獲取Canvas元素和上下文
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 遊戲狀態變數
+        let gameRunning = false;
+        let gamePaused = false;
+        let currentTrack = 1;
+        let currentLap = 0;
+        const totalLaps = 3;
+        let lapTimes = [];
+        let currentLapStart = 0;
+        let bestLapTime = 0;
+        let topSpeed = 0;
+        
+        // 賽車屬性
+        const car = {
+            x: 300,
+            y: 400,
+            width: 20,
+            height: 40,
+            speed: 0,
+            maxSpeed: 8,
+            acceleration: 0.2,
+            deceleration: 0.1,
+            brakePower: 0.5,
+            reverseSpeed: 3,
+            angle: 0,
+            turnSpeed: 0.05,
+            color: '#ef4444'
+        };
+        
+        // 賽道定義
+        const tracks = {
+            1: { // 城市賽道
+                name: "城市賽道",
+                color: "#4b5563",
+                borderColor: "#9ca3af",
+                startLine: { x: 300, y: 400, width: 60, angle: 0 },
+                checkpoints: [
+                    { x: 300, y: 100, radius: 50 },
+                    { x: 500, y: 200, radius: 50 },
+                    { x: 400, y: 350, radius: 50 },
+                    { x: 200, y: 300, radius: 50 },
+                    { x: 150, y: 150, radius: 50 }
+                ],
+                obstacles: [
+                    { x: 350, y: 250, width: 30, height: 30 },
+                    { x: 250, y: 200, width: 40, height: 20 },
+                    { x: 450, y: 300, width: 20, height: 40 }
+                ]
+            },
+            2: { // 山道狂飆
+                name: "山道狂飆",
+                color: "#065f46",
+                borderColor: "#10b981",
+                startLine: { x: 100, y: 250, width: 60, angle: Math.PI/2 },
+                checkpoints: [
+                    { x: 100, y: 100, radius: 50 },
+                    { x: 250, y: 150, radius: 50 },
+                    { x: 400, y: 100, radius: 50 },
+                    { x: 500, y: 200, radius: 50 },
+                    { x: 450, y: 350, radius: 50 },
+                    { x: 300, y: 400, radius: 50 },
+                    { x: 150, y: 350, radius: 50 }
+                ],
+                obstacles: [
+                    { x: 200, y: 200, width: 40, height: 40 },
+                    { x: 350, y: 250, width: 30, height: 30 },
+                    { x: 150, y: 300, width: 50, height: 20 }
+                ]
+            },
+            3: { // 高速環道
+                name: "高速環道",
+                color: "#1e40af",
+                borderColor: "#60a5fa",
+                startLine: { x: 300, y: 250, width: 60, angle: 0 },
+                checkpoints: [
+                    { x: 300, y: 100, radius: 50 },
+                    { x: 500, y: 250, radius: 50 },
+                    { x: 300, y: 400, radius: 50 },
+                    { x: 100, y: 250, radius: 50 }
+                ],
+                obstacles: [
+                    { x: 300, y: 150, width: 20, height: 20 },
+                    { x: 400, y: 300, width: 20, height: 20 },
+                    { x: 200, y: 300, width: 20, height: 20 }
+                ]
+            },
+            4: { // 橢圓賽道
+                name: "橢圓賽道",
+                color: "#7c3aed",
+                borderColor: "#a78bfa",
+                startLine: { x: 300, y: 300, width: 60, angle: 0 },
+                checkpoints: [
+                    { x: 300, y: 150, radius: 50 },
+                    { x: 450, y: 300, radius: 50 },
+                    { x: 300, y: 450, radius: 50 },
+                    { x: 150, y: 300, radius: 50 }
+                ],
+                obstacles: []
+            }
+        };
+        
+        // 從本地存儲加載最佳紀錄
+        let bestTimes = JSON.parse(localStorage.getItem('raceBestTimes')) || {
+            1: 0, // 城市賽道
+            2: 0, // 山道狂飆
+            3: 0, // 高速環道
+            4: 0  // 橢圓賽道
+        };
+        
+        // 鍵盤控制狀態
+        const keys = {
+            ArrowUp: false,
+            ArrowDown: false,
+            ArrowLeft: false,
+            ArrowRight: false,
+            w: false,
+            a: false,
+            s: false,
+            d: false
+        };
+        
+        // 初始化遊戲
+        function init() {
+            // 設置初始賽車位置
+            const track = tracks[currentTrack];
+            car.x = track.startLine.x;
+            car.y = track.startLine.y;
+            car.angle = track.startLine.angle;
+            car.speed = 0;
+            
+            // 重置遊戲狀態
+            currentLap = 0;
+            lapTimes = [];
+            currentLapStart = 0;
+            bestLapTime = bestTimes[currentTrack] || 0;
+            topSpeed = 0;
+            
+            // 更新顯示
+            updateDisplay();
+            updateTrackRecords();
+            
+            // 顯示開始畫面
+            document.getElementById('startOverlay').style.display = 'flex';
+            document.getElementById('resultsOverlay').style.display = 'none';
+            
+            // 繪製初始畫面
+            draw();
+        }
+        
+        // 繪製遊戲畫面
+        function draw() {
+            // 清除畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 繪製賽道背景
+            drawTrackBackground();
+            
+            // 繪製當前賽道
+            drawTrack();
+            
+            // 繪製賽車
+            drawCar();
+            
+            // 繪製檢查點
+            drawCheckpoints();
+            
+            // 繪製障礙物
+            drawObstacles();
+            
+            // 繪製起點線
+            drawStartLine();
+        }
+        
+        // 繪製賽道背景
+        function drawTrackBackground() {
+            // 繪製漸變背景
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#0f172a');
+            gradient.addColorStop(1, '#1e293b');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 繪製網格
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            
+            // 垂直線
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // 水平線
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+        
+        // 繪製當前賽道
+        function drawTrack() {
+            const track = tracks[currentTrack];
+            
+            // 繪製賽道邊界
+            ctx.strokeStyle = track.borderColor;
+            ctx.lineWidth = 8;
+            ctx.setLineDash([]);
+            
+            // 根據檢查點繪製賽道
+            ctx.beginPath();
+            for (let i = 0; i < track.checkpoints.length; i++) {
+                const checkpoint = track.checkpoints[i];
+                if (i === 0) {
+                    ctx.moveTo(checkpoint.x, checkpoint.y);
+                } else {
+                    ctx.lineTo(checkpoint.x, checkpoint.y);
+                }
+            }
+            // 關閉路徑
+            const firstCheckpoint = track.checkpoints[0];
+            ctx.lineTo(firstCheckpoint.x, firstCheckpoint.y);
+            ctx.stroke();
+            
+            // 繪製賽道內部
+            ctx.strokeStyle = track.color;
+            ctx.lineWidth = 40;
+            ctx.beginPath();
+            for (let i = 0; i < track.checkpoints.length; i++) {
+                const checkpoint = track.checkpoints[i];
+                if (i === 0) {
+                    ctx.moveTo(checkpoint.x, checkpoint.y);
+                } else {
+                    ctx.lineTo(checkpoint.x, checkpoint.y);
+                }
+            }
+            // 關閉路徑
+            ctx.lineTo(firstCheckpoint.x, firstCheckpoint.y);
+            ctx.stroke();
+        }
+        
+        // 繪製檢查點
+        function drawCheckpoints() {
+            const track = tracks[currentTrack];
+            
+            track.checkpoints.forEach((checkpoint, index) => {
+                // 繪製檢查點圓圈
+                ctx.beginPath();
+                ctx.arc(checkpoint.x, checkpoint.y, checkpoint.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // 繪製檢查點編號
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(index + 1, checkpoint.x, checkpoint.y);
+            });
+        }
+        
+        // 繪製障礙物
+        function drawObstacles() {
+            const track = tracks[currentTrack];
+            
+            track.obstacles.forEach(obstacle => {
+                ctx.fillStyle = '#dc2626';
+                ctx.fillRect(
+                    obstacle.x - obstacle.width/2, 
+                    obstacle.y - obstacle.height/2, 
+                    obstacle.width, 
+                    obstacle.height
+                );
+                
+                // 添加陰影效果
+                ctx.strokeStyle = '#991b1b';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(
+                    obstacle.x - obstacle.width/2, 
+                    obstacle.y - obstacle.height/2, 
+                    obstacle.width, 
+                    obstacle.height
+                );
+            });
+        }
+        
+        // 繪製起點線
+        function drawStartLine() {
+            const track = tracks[currentTrack];
+            const startLine = track.startLine;
+            
+            // 繪製起點線
+            ctx.save();
+            ctx.translate(startLine.x, startLine.y);
+            ctx.rotate(startLine.angle);
+            
+            // 黑白相間的起點線
+            const stripeWidth = startLine.width / 10;
+            for (let i = -startLine.width/2; i < startLine.width/2; i += stripeWidth * 2) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(i, -2, stripeWidth, 4);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(i + stripeWidth, -2, stripeWidth, 4);
+            }
+            
+            ctx.restore();
+            
+            // 繪製起點線標誌
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText('起點/終點', startLine.x, startLine.y - 10);
+        }
+        
+        // 繪製賽車
+        function drawCar() {
+            ctx.save();
+            ctx.translate(car.x, car.y);
+            ctx.rotate(car.angle);
+            
+            // 繪製車身
+            ctx.fillStyle = car.color;
+            ctx.fillRect(-car.width/2, -car.height/2, car.width, car.height);
+            
+            // 繪製車窗
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(-car.width/3, -car.height/3, car.width/1.5, car.height/3);
+            
+            // 繪製車燈
+            ctx.fillStyle = '#fbbf24';
+            ctx.fillRect(car.width/2 - 3, -car.height/4, 3, car.height/6);
+            ctx.fillRect(car.width/2 - 3, car.height/4 - car.height/6, 3, car.height/6);
+            
+            // 繪製尾燈
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(-car.width/2, -car.height/4, 3, car.height/6);
+            ctx.fillRect(-car.width/2, car.height/4 - car.height/6, 3, car.height/6);
+            
+            // 繪製輪胎
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(-car.width/2 - 2, -car.height/2 - 2, 4, 6);
+            ctx.fillRect(car.width/2 - 2, -car.height/2 - 2, 4, 6);
+            ctx.fillRect(-car.width/2 - 2, car.height/2 - 4, 4, 6);
+            ctx.fillRect(car.width/2 - 2, car.height/2 - 4, 4, 6);
+            
+            ctx.restore();
+            
+            // 繪製速度指示器
+            if (car.speed > 0) {
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(car.x, car.y);
+                const speedIndicatorLength = car.speed * 5;
+                ctx.lineTo(
+                    car.x + Math.cos(car.angle) * speedIndicatorLength,
+                    car.y + Math.sin(car.angle) * speedIndicatorLength
+                );
+                ctx.stroke();
+            }
+        }
+        
+        // 更新遊戲邏輯
+        function update() {
+            if (!gameRunning || gamePaused) return;
+            
+            // 處理輸入
+            handleInput();
+            
+            // 更新賽車位置
+            car.x += Math.cos(car.angle) * car.speed;
+            car.y += Math.sin(car.angle) * car.speed;
+            
+            // 邊界檢查
+            if (car.x < 0) car.x = 0;
+            if (car.x > canvas.width) car.x = canvas.width;
+            if (car.y < 0) car.y = 0;
+            if (car.y > canvas.height) car.y = canvas.height;
+            
+            // 更新速度顯示
+            const speedKmh = Math.abs(car.speed * 20).toFixed(0);
+            document.querySelector('.speed-value').textContent = speedKmh;
+            document.getElementById('currentSpeed').textContent = speedKmh + ' km/h';
+            
+            // 更新最高速度
+            if (speedKmh > topSpeed) {
+                topSpeed = speedKmh;
+                document.getElementById('topSpeed').textContent = topSpeed + ' km/h';
+            }
+            
+            // 檢查是否在賽道上
+            checkTrackPosition();
+            
+            // 檢查碰撞
+            checkCollisions();
+            
+            // 檢查檢查點
+            checkCheckpoints();
+            
+            // 檢查是否通過起點線
+            checkStartLine();
+            
+            // 繪製遊戲
+            draw();
+        }
+        
+        // 處理輸入
+        function handleInput() {
+            // 加速
+            if (keys.ArrowUp || keys.w) {
+                car.speed += car.acceleration;
+                if (car.speed > car.maxSpeed) car.speed = car.maxSpeed;
+            }
+            // 剎車/倒車
+            else if (keys.ArrowDown || keys.s) {
+                if (car.speed > 0) {
+                    car.speed -= car.brakePower;
+                    if (car.speed < 0) car.speed = 0;
+                } else {
+                    car.speed -= car.acceleration;
+                    if (car.speed < -car.reverseSpeed) car.speed = -car.reverseSpeed;
+                }
+            }
+            // 自然減速
+            else {
+                if (car.speed > 0) {
+                    car.speed -= car.deceleration;
+                    if (car.speed < 0) car.speed = 0;
+                } else if (car.speed < 0) {
+                    car.speed += car.deceleration;
+                    if (car.speed > 0) car.speed = 0;
+                }
+            }
+            
+            // 轉向
+            if (keys.ArrowLeft || keys.a) {
+                car.angle -= car.turnSpeed * (1 + car.speed / car.maxSpeed);
+            }
+            if (keys.ArrowRight || keys.d) {
+                car.angle += car.turnSpeed * (1 + car.speed / car.maxSpeed);
+            }
+        }
+        
+        // 檢查賽車是否在賽道上
+        function checkTrackPosition() {
+            const track = tracks[currentTrack];
+            let onTrack = false;
+            
+            // 簡單檢查：檢查賽車是否靠近任何檢查點
+            for (const checkpoint of track.checkpoints) {
+                const distance = Math.sqrt(
+                    Math.pow(car.x - checkpoint.x, 2) + 
+                    Math.pow(car.y - checkpoint.y, 2)
+                );
+                
+                if (distance < checkpoint.radius + 50) {
+                    onTrack = true;
+                    break;
+                }
+            }
+            
+            // 如果不在賽道上，減速
+            if (!onTrack) {
+                car.speed *= 0.95; // 大幅減速
+            }
+        }
+        
+        // 檢查碰撞
+        function checkCollisions() {
+            const track = tracks[currentTrack];
+            
+            track.obstacles.forEach(obstacle => {
+                const obstacleLeft = obstacle.x - obstacle.width/2;
+                const obstacleRight = obstacle.x + obstacle.width/2;
+                const obstacleTop = obstacle.y - obstacle.height/2;
+                const obstacleBottom = obstacle.y + obstacle.height/2;
+                
+                const carLeft = car.x - car.width/2;
+                const carRight = car.x + car.width/2;
+                const carTop = car.y - car.height/2;
+                const carBottom = car.y + car.height/2;
+                
+                // 簡單的矩形碰撞檢測
+                if (carRight > obstacleLeft && 
+                    carLeft < obstacleRight && 
+                    carBottom > obstacleTop && 
+                    carTop < obstacleBottom) {
+                    
+                    // 碰撞反應：大幅減速和反彈
+                    car.speed *= -0.5;
+                }
+            });
+        }
+        
+        // 檢查檢查點
+        function checkCheckpoints() {
+            // 檢查點系統在此版本中簡化，實際完整遊戲需要追蹤通過的檢查點順序
+        }
+        
+        // 檢查是否通過起點線
+        function checkStartLine() {
+            const track = tracks[currentTrack];
+            const startLine = track.startLine;
+            
+            // 計算賽車與起點線的距離
+            const distance = Math.sqrt(
+                Math.pow(car.x - startLine.x, 2) + 
+                Math.pow(car.y - startLine.y, 2)
+            );
+            
+            // 如果距離足夠近且速度方向正確，認為通過起點線
+            if (distance < 30 && Math.abs(car.speed) > 1) {
+                // 計算與起點線的角度差
+                const carAngle = Math.atan2(
+                    Math.sin(car.angle - startLine.angle), 
+                    Math.cos(car.angle - startLine.angle)
+                );
+                
+                // 如果角度大致相同方向，認為是正確方向通過
+                if (Math.abs(carAngle) < Math.PI/4) {
+                    if (currentLap === 0) {
+                        // 開始第一圈
+                        currentLap = 1;
+                        currentLapStart = Date.now();
+                        document.querySelector('.lap-counter .current').textContent = currentLap;
+                        document.getElementById('startOverlay').style.display = 'none';
+                    } else {
+                        // 完成一圈
+                        const lapTime = Date.now() - currentLapStart;
+                        lapTimes.push(lapTime);
+                        
+                        // 更新最佳圈速
+                        if (bestLapTime === 0 || lapTime < bestLapTime) {
+                            bestLapTime = lapTime;
+                            bestTimes[currentTrack] = bestLapTime;
+                            localStorage.setItem('raceBestTimes', JSON.stringify(bestTimes));
+                            updateTrackRecords();
+                        }
+                        
+                        // 更新顯示
+                        updateDisplay();
+                        
+                        // 檢查是否完成所有圈數
+                        if (currentLap >= totalLaps) {
+                            finishRace();
+                            return;
+                        }
+                        
+                        // 開始新的一圈
+                        currentLap++;
+                        currentLapStart = Date.now();
+                        document.querySelector('.lap-counter .current').textContent = currentLap;
+                    }
+                }
+            }
+        }
+        
+        // 完成比賽
+        function finishRace() {
+            gameRunning = false;
+            
+            // 計算總時間
+            const totalTime = lapTimes.reduce((sum, time) => sum + time, 0);
+            const finalTime = (totalTime / 1000).toFixed(3);
+            
+            // 顯示結果
+            document.getElementById('finalTime').textContent = finalTime + 's';
+            
+            // 顯示與最佳紀錄的比較
+            const bestTime = bestTimes[currentTrack];
+            const comparisonDiv = document.getElementById('timeComparison');
+            
+            if (bestTime === 0) {
+                comparisonDiv.innerHTML = '<div class="new-record">這是本賽道的第一個紀錄！</div>';
+            } else if (totalTime < bestTime) {
+                const diff = (bestTime - totalTime) / 1000;
+                comparisonDiv.innerHTML = `<div class="new-record">打破紀錄！快了 ${diff.toFixed(3)} 秒！</div>`;
+            } else {
+                const diff = (totalTime - bestTime) / 1000;
+                comparisonDiv.innerHTML = `與最佳紀錄相差 ${diff.toFixed(3)} 秒`;
+            }
+            
+            document.getElementById('resultsOverlay').style.display = 'flex';
+        }
+        
+        // 更新顯示
+        function updateDisplay() {
+            // 更新當前圈速
+            if (currentLap > 0) {
+                const currentTime = Date.now() - currentLapStart;
+                document.getElementById('currentTime').textContent = (currentTime / 1000).toFixed(3);
+            } else {
+                document.getElementById('currentTime').textContent = "0.000";
+            }
+            
+            // 更新最佳圈速
+            document.getElementById('bestTime').textContent = bestLapTime === 0 ? "0.000" : (bestLapTime / 1000).toFixed(3);
+            
+            // 更新圈數顯示
+            document.querySelector('.lap-counter .total').textContent = totalLaps;
+        }
+        
+        // 更新賽道紀錄顯示
+        function updateTrackRecords() {
+            const recordsDiv = document.getElementById('trackRecords');
+            let html = '';
+            
+            for (const [trackId, time] of Object.entries(bestTimes)) {
+                if (time > 0) {
+                    const trackName = tracks[trackId].name;
+                    const formattedTime = (time / 1000).toFixed(3);
+                    html += `
+                        <div class="time-record">
+                            <span class="track">${trackName}</span>
+                            <span class="time">${formattedTime}s</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            if (html === '') {
+                html = '<div style="color: #94a3b8; text-align: center;">尚無紀錄</div>';
+            }
+            
+            recordsDiv.innerHTML = html;
+        }
+        
+        // 開始遊戲
+        function startGame() {
+            gameRunning = true;
+            gamePaused = false;
+            document.getElementById('startOverlay').style.display = 'none';
+        }
+        
+        // 重置遊戲
+        function resetGame() {
+            init();
+        }
+        
+        // 切換賽道
+        function changeTrack(trackId) {
+            currentTrack = trackId;
+            
+            // 更新選中狀態
+            document.querySelectorAll('.track-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.track == trackId) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // 重置遊戲
+            init();
+        }
+        
+        // 事件監聽器
+        // 鍵盤控制
+        document.addEventListener('keydown', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = true;
+            }
+            
+            // 空格鍵暫停/繼續
+            if (e.key === ' ' && gameRunning) {
+                e.preventDefault();
+                gamePaused = !gamePaused;
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = false;
+            }
+        });
+        
+        // 按鈕事件
+        document.getElementById('startButton').addEventListener('click', startGame);
+        document.getElementById('resetButton').addEventListener('click', resetGame);
+        document.getElementById('nextRaceButton').addEventListener('click', () => {
+            document.getElementById('resultsOverlay').style.display = 'none';
+            resetGame();
+        });
+        
+        // 賽道選擇
+        document.querySelectorAll('.track-option').forEach(option => {
+            option.addEventListener('click', () => {
+                changeTrack(parseInt(option.dataset.track));
+            });
+        });
+        
+        // 遊戲循環
+        function gameLoop() {
+            update();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 初始化遊戲
+        init();
+        
+        // 啟動遊戲循環
+        gameLoop();
+    </script>
+</body>
+</html>

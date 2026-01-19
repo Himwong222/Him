@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我的遊戲館</title>
+    <title>Him Wong 遊戲館</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,23 @@
             padding: 40px;
         }
         h1 { margin-bottom: 30px; }
-        .games { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .category {
+            margin: 40px 0;
+        }
+        .category-title {
+            font-size: 1.5em;
+            color: #6c63ff;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #6c63ff;
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .games { 
+            display: flex; 
+            flex-wrap: wrap; 
+            justify-content: center; 
+            gap: 15px; 
+        }
         .game-card {
             background: #2d2d44;
             padding: 25px 35px;
@@ -21,33 +37,85 @@
             text-decoration: none;
             color: white;
             transition: 0.3s;
+            width: 150px;
         }
-        .game-card:hover { background: #3d3d5c; transform: scale(1.05); }
-        .icon { font-size: 2em; }
+        .game-card:hover { 
+            background: #3d3d5c; 
+            transform: scale(1.05); 
+        }
+        .icon { font-size: 2em; margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <h1>🎮 我的遊戲館</h1>
-    <div class="games">
-        <a href="game1.html" class="game-card">
-            <div class="icon">🎯</div>
-            <div>Google Dinasour</div>
-        </a>
-        <a href="game2.html" class="game-card">
-            <div class="icon">✊</div>
-            <div>中國象棋</div>
-        </a>
-        <!-- 加更多遊戲 -->
-         <a href="game3.html" class="game-card">
-            <div class="icon">🎯</div>
-            <div>俄羅斯方塊BlockBlast</div>
-        </a>
-         <a href="game4.html" class="game-card">
-            <div class="icon">🎯</div>
-            <div>2048</div>
-         <a href="game5.html" class="game-card">
-            <div class="icon">🎯</div>
-            <div>經典貪食蛇</div>
+    <h1>🎮 Him Wong 遊戲館</h1>
+    
+    <!-- 小遊戲分類 -->
+    <div class="category">
+        <h2 class="category-title">🎮 小遊戲</h2>
+        <div class="games">
+            <a href="game1.html" class="game-card">
+                <div class="icon">🦕</div>
+                <div>Google Dinasour</div>
+            </a>
+            <a href="game3.html" class="game-card">
+                <div class="icon">🧱</div>
+                <div>俄羅斯方塊</div>
+            </a>
+            <a href="game4.html" class="game-card">
+                <div class="icon">🔢</div>
+                <div>2048</div>
+            </a>
+            <a href="game5.html" class="game-card">
+                <div class="icon">🐍</div>
+                <div>經典貪食蛇</div>
+            </a>
+            <a href="game6.html" class="game-card">
+                <div class="icon">💣</div>
+                <div>掃地雷</div>
+            </a>
+            <a href="game7.html" class="game-card">
+                <div class="icon">🎮</div>
+                <div>打磚塊</div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- 互動遊戲分類 -->
+    <div class="category">
+        <h2 class="category-title">👥 互動遊戲</h2>
+        <div class="games">
+            <a href="game2.html" class="game-card">
+                <div class="icon">♟️</div>
+                <div>中國象棋</div>
+            </a>
+            <a href="game8.html" class="game-card">
+                <div class="icon">⭕</div>
+                <div>井字遊戲</div>
+            </a>
+            <a href="game9.html" class="game-card">
+                <div class="icon">🏎️</div>
+                <div>賽車遊戲</div>
+            </a>
+            <a href="game10.html" class="game-card">
+                <div class="icon">⚔️</div>
+                <div>五子棋</div>
+            </a>
+        </div>
+    </div>
+    
+    <!-- 體感遊戲分類 -->
+    <div class="category">
+        <h2 class="category-title">💃 體感遊戲</h2>
+        <div class="games">
+            <a href="game11.html" class="game-card">
+                <div class="icon">✊✌️✋</div>
+                <div>體感包剪揼</div>
+            </a>
+            <a href="game12.html" class="game-card">
+                <div class="icon">🏓</div>
+                <div>體感乒乓球</div>
+            </a>
+        </div>
     </div>
 </body>
 </html>
