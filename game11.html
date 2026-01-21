@@ -1,541 +1,644 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>體感包剪揼 | Him Wong 遊戲館</title>
+    <title>HTML5體感乒乓球遊戲</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            min-height: 100vh;
+        }
+        
+        body {
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #fff;
             padding: 20px;
             overflow-x: hidden;
         }
-
-        .container {
-            max-width: 1200px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            color: #6c63ff;
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        .subtitle {
-            color: #aaa;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-        }
-
-        .game-area {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 30px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .camera-section {
-            flex: 1;
-            min-width: 300px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 20px;
+        
+        .game-container {
             display: flex;
             flex-direction: column;
-        }
-
-        .section-title {
-            color: #6c63ff;
-            margin-bottom: 15px;
-            font-size: 1.4rem;
-            border-bottom: 2px solid #6c63ff;
-            padding-bottom: 8px;
-        }
-
-        #camera-container {
+            align-items: center;
+            max-width: 900px;
             width: 100%;
-            height: 300px;
-            background-color: #000;
-            border-radius: 10px;
-            overflow: hidden;
-            position: relative;
-            margin-bottom: 15px;
+            gap: 20px;
         }
-
-        #video {
+        
+        .game-header {
+            text-align: center;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* 鏡像翻轉，讓它更像鏡子 */
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0ea5e9;
         }
-
-        #canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        
+        .game-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #0ea5e9, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-
-        .camera-controls {
+        
+        .game-header p {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        
+        .main-content {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 25px;
+            width: 100%;
         }
-
-        button {
+        
+        .game-section {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .controls-section {
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .game-area {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 3px solid #1e293b;
+            background-color: #0f172a;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background-color: #0f172a;
+        }
+        
+        .controls-panel {
+            background-color: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 25px;
+        }
+        
+        .controls-panel h2 {
+            color: #0ea5e9;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-modes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .control-mode {
+            background-color: #334155;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .control-mode:hover {
+            transform: translateY(-3px);
+            background-color: #475569;
+        }
+        
+        .control-mode.active {
+            border-color: #0ea5e9;
+            background-color: #475569;
+            box-shadow: 0 0 15px rgba(14, 165, 233, 0.4);
+        }
+        
+        .mode-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #0ea5e9;
+        }
+        
+        .mode-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+        }
+        
+        .mode-desc {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+        }
+        
+        .stats-panel {
+            background-color: rgba(30, 41, 59, 0.7);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stats-panel h2 {
+            color: #0ea5e9;
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-box {
+            background-color: #334155;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #f8fafc;
+        }
+        
+        .player1 {
+            color: #3b82f6;
+        }
+        
+        .player2 {
+            color: #ef4444;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
             padding: 12px 25px;
-            background-color: #6c63ff;
-            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.3s;
-            flex: 1;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-
-        button:hover {
-            background-color: #5a52d5;
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
             transform: translateY(-2px);
         }
-
-        button:active {
-            transform: translateY(1px);
+        
+        .btn-success {
+            background-color: #10b981;
+            color: white;
         }
-
-        button:disabled {
-            background-color: #3d3d5c;
-            cursor: not-allowed;
-            transform: none;
+        
+        .btn-success:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
         }
-
-        #start-btn {
-            background-color: #4CAF50;
+        
+        .btn-warning {
+            background-color: #f59e0b;
+            color: white;
         }
-
-        #start-btn:hover:not(:disabled) {
-            background-color: #45a049;
+        
+        .btn-warning:hover {
+            background-color: #d97706;
+            transform: translateY(-2px);
         }
-
-        #stop-btn {
-            background-color: #ff6b6b;
-        }
-
-        #stop-btn:hover:not(:disabled) {
-            background-color: #ff5252;
-        }
-
-        .game-section {
-            flex: 1;
-            min-width: 300px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .gesture-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-        }
-
-        .gesture-box {
-            background-color: #2d2d44;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            flex: 1;
-            margin: 0 10px;
-            transition: all 0.3s;
-        }
-
-        .gesture-box.active {
-            background-color: #3d3d5c;
-            box-shadow: 0 0 15px rgba(108, 99, 255, 0.5);
-        }
-
-        .gesture-icon {
-            font-size: 4rem;
-            margin-bottom: 10px;
-        }
-
-        .gesture-name {
-            font-size: 1.3rem;
-            color: #ffd166;
-        }
-
-        .gesture-status {
-            font-size: 1.1rem;
-            color: #aaa;
-            margin-top: 5px;
-        }
-
-        .game-controls {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-        }
-
-        .game-state {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .countdown {
-            font-size: 3rem;
-            color: #ff6b6b;
-            font-weight: bold;
-            text-align: center;
-            width: 100px;
-            height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background-color: rgba(255, 107, 107, 0.1);
-            border: 5px solid #ff6b6b;
-        }
-
-        .vs {
-            font-size: 2rem;
-            color: #ffd166;
-            font-weight: bold;
-        }
-
-        .game-result {
-            text-align: center;
-            font-size: 1.8rem;
-            margin: 15px 0;
-            min-height: 50px;
-            color: #6c63ff;
-            font-weight: bold;
-        }
-
-        .scoreboard {
-            background-color: rgba(0, 0, 0, 0.3);
-            padding: 25px;
-            border-radius: 15px;
-            margin-top: 20px;
-        }
-
-        .score-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .score-box {
-            background-color: #2d2d44;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            flex: 1;
-            margin: 0 10px;
-        }
-
-        .score-label {
-            font-size: 1rem;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-
-        .score-value {
-            font-size: 2.5rem;
-            color: #6c63ff;
-            font-weight: bold;
-        }
-
-        .game-history {
-            margin-top: 20px;
-        }
-
-        .history-title {
-            color: #6c63ff;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-        }
-
-        #history-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            background-color: #2d2d44;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .history-winner {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-
-        .history-looser {
-            color: #ff6b6b;
-        }
-
+        
         .instructions {
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(30, 41, 59, 0.7);
             padding: 25px;
             border-radius: 15px;
-            margin-top: 30px;
-            max-width: 800px;
+            width: 100%;
+            margin-top: 10px;
         }
-
+        
         .instructions h3 {
-            color: #6c63ff;
+            color: #0ea5e9;
             margin-bottom: 15px;
-        }
-
-        .instructions-list {
-            margin-left: 20px;
-            margin-bottom: 15px;
-        }
-
-        .instructions-list li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-
-        .instructions-list strong {
-            color: #ffd166;
-        }
-
-        .gesture-guide {
+            font-size: 1.3rem;
             display: flex;
-            justify-content: space-around;
-            margin-top: 20px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .guide-item {
-            text-align: center;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .guide-icon {
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-        }
-
-        .guide-text {
-            color: #aaa;
-        }
-
-        footer {
-            margin-top: 30px;
-            text-align: center;
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        .loading {
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            gap: 10px;
+        }
+        
+        .control-instructions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .control-group {
+            background-color: #334155;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .control-group h4 {
+            color: #f59e0b;
+            margin-bottom: 10px;
+        }
+        
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #475569;
+        }
+        
+        .control-item:last-child {
+            border-bottom: none;
+        }
+        
+        .key {
+            background-color: #475569;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+        
+        .game-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 10;
-            border-radius: 10px;
-        }
-
-        .spinner {
-            border: 5px solid #3d3d5c;
-            border-top: 5px solid #6c63ff;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .detection-status {
+            background-color: rgba(15, 23, 42, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
             text-align: center;
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 10;
+            border-radius: 15px;
+        }
+        
+        .overlay-content {
+            padding: 40px;
+            background-color: rgba(30, 41, 59, 0.9);
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .overlay-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #f59e0b;
+        }
+        
+        .overlay-content p {
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            color: #cbd5e1;
+        }
+        
+        .score-display {
+            font-size: 3rem;
+            color: #10b981;
+            font-weight: bold;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        .winner {
+            color: #f59e0b;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .calibration-info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
             font-size: 0.9rem;
-            color: #aaa;
+            max-width: 250px;
+            display: none;
         }
-
-        .detection-status.active {
-            color: #4CAF50;
-            background-color: rgba(76, 175, 80, 0.1);
+        
+        .calibration-info.show {
+            display: block;
         }
-
+        
+        .tilt-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            display: none;
+        }
+        
+        .tilt-indicator.show {
+            display: flex;
+        }
+        
+        .tilt-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f8fafc;
+            font-family: monospace;
+        }
+        
+        .tilt-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        
+        .mobile-tilt-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            z-index: 20;
+            max-width: 300px;
+        }
+        
+        .mobile-tilt-warning.show {
+            display: block;
+        }
+        
         @media (max-width: 768px) {
-            .game-area {
+            .main-content {
                 flex-direction: column;
             }
             
-            .gesture-info {
-                flex-direction: column;
-                gap: 15px;
+            .control-instructions {
+                grid-template-columns: 1fr;
             }
             
-            .gesture-box {
-                margin: 0;
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
             
-            .score-row {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .score-box {
-                margin: 0;
-            }
-            
-            h1 {
+            .game-header h1 {
                 font-size: 2.2rem;
             }
             
-            .gesture-guide {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .camera-controls {
-                flex-direction: column;
+            #gameCanvas {
+                width: 100%;
+                height: auto;
             }
             
-            .game-state {
-                flex-direction: column;
-                gap: 20px;
+            .tilt-indicator {
+                top: 10px;
+                right: 10px;
+                padding: 10px;
             }
+            
+            .calibration-info {
+                bottom: 10px;
+                left: 10px;
+                max-width: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
+            
+            .control-modes {
+                flex-direction: column;
+            }
+        }
+        
+        .gyro-status {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .gyro-status.active {
+            color: #10b981;
+        }
+        
+        .gyro-status.inactive {
+            color: #ef4444;
+        }
+        
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5rem;
+            font-weight: bold;
+            color: #f59e0b;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.7);
+            z-index: 15;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>✊✌️✋ 體感包剪揼</h1>
-            <p class="subtitle">使用您的攝像頭進行體感猜拳遊戲！</p>
-        </header>
+    <div class="game-container">
+        <div class="game-header">
+            <h1><i class="fas fa-table-tennis-paddle-ball"></i> 體感乒乓球</h1>
+            <p>使用設備運動感應器控制球拍，體驗真實的乒乓球對戰！</p>
+        </div>
         
-        <div class="game-area">
-            <div class="camera-section">
-                <h3 class="section-title">攝像頭畫面</h3>
-                <div id="camera-container">
-                    <video id="video" autoplay playsinline></video>
-                    <canvas id="canvas"></canvas>
-                    <div id="loading" class="loading">
-                        <div class="spinner"></div>
-                        <p>正在載入手部識別模型...</p>
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-area">
+                    <canvas id="gameCanvas" width="800" height="500"></canvas>
+                    
+                    <div class="gyro-status inactive">
+                        <i class="fas fa-sensor"></i>
+                        <span>體感控制: 未啟用</span>
+                    </div>
+                    
+                    <div class="tilt-indicator">
+                        <div class="tilt-label">傾斜角度</div>
+                        <div class="tilt-value">0°</div>
+                    </div>
+                    
+                    <div class="calibration-info">
+                        <i class="fas fa-info-circle"></i> 請將設備保持水平以進行校準
+                    </div>
+                    
+                    <div class="countdown" id="countdown">3</div>
+                    
+                    <div class="mobile-tilt-warning">
+                        <h3>需要設備權限</h3>
+                        <p>請允許此網站使用設備運動與方向感應器，以啟用體感控制功能。</p>
+                        <p>或者，您可以在下方選擇滑鼠或鍵盤控制。</p>
+                    </div>
+                    
+                    <div id="startOverlay" class="game-overlay">
+                        <div class="overlay-content">
+                            <h2>體感乒乓球</h2>
+                            <p>選擇控制方式後點擊"開始遊戲"</p>
+                            <p>玩家1（左側）與玩家2（右側）對戰</p>
+                            <div class="controls" style="margin-top: 30px;">
+                                <button id="startButton" class="btn btn-primary">
+                                    <i class="fas fa-play"></i> 開始遊戲
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="resultsOverlay" class="game-overlay">
+                        <div class="overlay-content">
+                            <h2>遊戲結束</h2>
+                            <p id="winnerMessage"></p>
+                            <div class="score-display">
+                                <span id="player1Score">0</span> : <span id="player2Score">0</span>
+                            </div>
+                            <button id="restartButton" class="btn btn-success" style="margin-top: 20px;">
+                                <i class="fas fa-redo"></i> 再玩一次
+                            </button>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="detection-status" id="detection-status">
-                    等待啟動攝像頭...
-                </div>
-                
-                <div class="camera-controls">
-                    <button id="start-btn">啟動攝像頭</button>
-                    <button id="stop-btn" disabled>停止攝像頭</button>
-                    <button id="game-btn" disabled>開始遊戲</button>
+                <div class="controls">
+                    <button id="startBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> 開始遊戲
+                    </button>
+                    <button id="pauseBtn" class="btn btn-warning">
+                        <i class="fas fa-pause"></i> 暫停遊戲
+                    </button>
+                    <button id="resetBtn" class="btn btn-success">
+                        <i class="fas fa-redo"></i> 重新開始
+                    </button>
                 </div>
             </div>
             
-            <div class="game-section">
-                <div class="gesture-info">
-                    <div class="gesture-box" id="player-gesture">
-                        <div class="gesture-icon">?</div>
-                        <div class="gesture-name">玩家手勢</div>
-                        <div class="gesture-status" id="player-status">等待檢測</div>
-                    </div>
-                    
-                    <div class="gesture-box" id="ai-gesture">
-                        <div class="gesture-icon">?</div>
-                        <div class="gesture-name">電腦手勢</div>
-                        <div class="gesture-status" id="ai-status">等待遊戲開始</div>
+            <div class="controls-section">
+                <div class="controls-panel">
+                    <h2><i class="fas fa-gamepad"></i> 控制方式</h2>
+                    <div class="control-modes">
+                        <div class="control-mode active" data-mode="gyro">
+                            <div class="mode-icon"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="mode-name">體感控制</div>
+                            <div class="mode-desc">傾斜設備控制球拍。左側玩家使用設備傾斜，右側玩家使用滑鼠或鍵盤。</div>
+                        </div>
+                        <div class="control-mode" data-mode="mouse">
+                            <div class="mode-icon"><i class="fas fa-computer-mouse"></i></div>
+                            <div class="mode-name">滑鼠控制</div>
+                            <div class="mode-desc">使用滑鼠控制兩側球拍。左側玩家使用滑鼠左鍵區域，右側玩家使用滑鼠右鍵區域。</div>
+                        </div>
+                        <div class="control-mode" data-mode="keyboard">
+                            <div class="mode-icon"><i class="fas fa-keyboard"></i></div>
+                            <div class="mode-name">鍵盤控制</div>
+                            <div class="mode-desc">使用鍵盤控制。玩家1: W/S鍵，玩家2: ↑/↓鍵。</div>
+                        </div>
                     </div>
                 </div>
                 
-                <div class="game-controls">
-                    <div class="game-state">
-                        <div class="gesture-box">
-                            <div class="gesture-icon">👤</div>
-                            <div class="gesture-name">玩家</div>
+                <div class="stats-panel">
+                    <h2><i class="fas fa-chart-line"></i> 比賽數據</h2>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-label">玩家1 分數</div>
+                            <div id="scorePlayer1" class="stat-value player1">0</div>
                         </div>
-                        
-                        <div class="countdown" id="countdown">3</div>
-                        
-                        <div class="gesture-box">
-                            <div class="gesture-icon">🤖</div>
-                            <div class="gesture-name">電腦</div>
+                        <div class="stat-box">
+                            <div class="stat-label">玩家2 分數</div>
+                            <div id="scorePlayer2" class="stat-value player2">0</div>
                         </div>
-                    </div>
-                    
-                    <div class="game-result" id="game-result">
-                        準備開始遊戲！
-                    </div>
-                </div>
-                
-                <div class="scoreboard">
-                    <div class="score-row">
-                        <div class="score-box">
-                            <div class="score-label">玩家得分</div>
-                            <div class="score-value" id="player-score">0</div>
+                        <div class="stat-box">
+                            <div class="stat-label">回合數</div>
+                            <div id="roundCount" class="stat-value">0</div>
                         </div>
-                        
-                        <div class="score-box">
-                            <div class="score-label">平局</div>
-                            <div class="score-value" id="draw-score">0</div>
-                        </div>
-                        
-                        <div class="score-box">
-                            <div class="score-label">電腦得分</div>
-                            <div class="score-value" id="ai-score">0</div>
+                        <div class="stat-box">
+                            <div class="stat-label">球速</div>
+                            <div id="ballSpeed" class="stat-value">正常</div>
                         </div>
                     </div>
                     
-                    <div class="game-history">
-                        <div class="history-title">遊戲記錄</div>
-                        <div id="history-list">
-                            <div class="history-item">遊戲尚未開始</div>
+                    <div class="control-instructions">
+                        <div class="control-group">
+                            <h4>玩家1 控制</h4>
+                            <div id="player1Controls">
+                                <!-- 控制說明會動態更新 -->
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <h4>玩家2 控制</h4>
+                            <div id="player2Controls">
+                                <!-- 控制說明會動態更新 -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -543,554 +646,791 @@
         </div>
         
         <div class="instructions">
-            <h3>遊戲說明</h3>
-            <ul class="instructions-list">
-                <li>點擊<strong>啟動攝像頭</strong>按鈕，允許瀏覽器訪問您的攝像頭。</li>
-                <li>將您的手放在攝像頭前，確保光線充足，背景簡單。</li>
-                <li>點擊<strong>開始遊戲</strong>按鈕開始一輪猜拳遊戲。</li>
-                <li>遊戲開始後，倒數3秒，請在倒數結束前擺好手勢。</li>
-                <li>系統會檢測您的手勢（剪刀✌️、石頭✊、布✋），並與電腦隨機生成的手勢比較。</li>
-                <li>遊戲規則：剪刀贏布、布贏石頭、石頭贏剪刀。</li>
-                <li>遊戲結果會記錄在下方，並更新得分。</li>
-            </ul>
-            
-            <div class="gesture-guide">
-                <div class="guide-item">
-                    <div class="guide-icon">✊</div>
-                    <div class="guide-text">握拳表示「石頭」</div>
+            <h3><i class="fas fa-info-circle"></i> 遊戲說明</h3>
+            <div class="control-instructions">
+                <div class="control-group">
+                    <h4>遊戲規則</h4>
+                    <ul style="padding-left: 20px; color: #cbd5e1;">
+                        <li>首先獲得11分的玩家獲勝</li>
+                        <li>每得一分交換發球權</li>
+                        <li>每5分球速會加快</li>
+                        <li>球拍中央區域反彈效果最佳</li>
+                        <li>球拍邊緣區域反彈角度較大</li>
+                    </ul>
                 </div>
-                
-                <div class="guide-item">
-                    <div class="guide-icon">✌️</div>
-                    <div class="guide-text">伸出食指和中指表示「剪刀」</div>
-                </div>
-                
-                <div class="guide-item">
-                    <div class="guide-icon">✋</div>
-                    <div class="guide-text">張開手掌表示「布」</div>
+                <div class="control-group">
+                    <h4>體感控制提示</h4>
+                    <ul style="padding-left: 20px; color: #cbd5e1;">
+                        <li>確保設備支持陀螺儀/加速度計</li>
+                        <li>遊戲開始前將設備保持水平以校準</li>
+                        <li>傾斜設備控制左側球拍</li>
+                        <li>如需重新校準，請點擊"重新開始"按鈕</li>
+                        <li>某些瀏覽器需要HTTPS連接才能使用體感功能</li>
+                    </ul>
                 </div>
             </div>
         </div>
-        
-        <footer>
-            <p>Him Wong 遊戲館 | 體感包剪揼遊戲 © 2023 | 使用TensorFlow.js Handpose模型</p>
-        </footer>
     </div>
 
-    <!-- 載入TensorFlow.js和Handpose模型 -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
-    
     <script>
-        // 遊戲狀態變數
-        let gameActive = false;
-        let countdownActive = false;
-        let countdownValue = 3;
-        let countdownInterval = null;
-        let playerGesture = null;
-        let aiGesture = null;
-        let scores = { player: 0, ai: 0, draw: 0 };
-        let history = [];
-        let handposeModel = null;
-        let videoStream = null;
-        let animationFrameId = null;
-        let lastGestureTime = 0;
-        let stableGesture = null;
-        let gestureStableCount = 0;
+        // 獲取Canvas元素和上下文
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
         
-        // DOM 元素
-        const videoElement = document.getElementById('video');
-        const canvasElement = document.getElementById('canvas');
-        const canvasContext = canvasElement.getContext('2d');
-        const loadingElement = document.getElementById('loading');
-        const detectionStatusElement = document.getElementById('detection-status');
-        const playerGestureElement = document.getElementById('player-gesture');
-        const playerStatusElement = document.getElementById('player-status');
-        const playerGestureIcon = playerGestureElement.querySelector('.gesture-icon');
-        const aiGestureElement = document.getElementById('ai-gesture');
-        const aiStatusElement = document.getElementById('ai-status');
-        const aiGestureIcon = aiGestureElement.querySelector('.gesture-icon');
-        const countdownElement = document.getElementById('countdown');
-        const gameResultElement = document.getElementById('game-result');
-        const playerScoreElement = document.getElementById('player-score');
-        const aiScoreElement = document.getElementById('ai-score');
-        const drawScoreElement = document.getElementById('draw-score');
-        const historyListElement = document.getElementById('history-list');
-        const startButton = document.getElementById('start-btn');
-        const stopButton = document.getElementById('stop-btn');
-        const gameButton = document.getElementById('game-btn');
+        // 遊戲狀態變數
+        let gameRunning = false;
+        let gamePaused = false;
+        let gameOver = false;
+        let controlMode = 'gyro'; // gyro, mouse, keyboard
+        let gyroAvailable = false;
+        let gyroCalibrated = false;
+        let gyroCalibrationValue = 0;
+        
+        // 遊戲分數
+        let player1Score = 0;
+        let player2Score = 0;
+        let roundCount = 0;
+        let ballSpeed = 5;
+        let maxScore = 11;
+        
+        // 遊戲元素
+        const table = {
+            width: canvas.width,
+            height: canvas.height,
+            color: '#0f172a',
+            net: {
+                x: canvas.width / 2,
+                y: 0,
+                width: 4,
+                height: canvas.height,
+                color: '#94a3b8'
+            }
+        };
+        
+        const player1 = {
+            x: 30,
+            y: canvas.height / 2 - 50,
+            width: 15,
+            height: 100,
+            color: '#3b82f6',
+            speed: 8,
+            score: 0
+        };
+        
+        const player2 = {
+            x: canvas.width - 45,
+            y: canvas.height / 2 - 50,
+            width: 15,
+            height: 100,
+            color: '#ef4444',
+            speed: 8,
+            score: 0
+        };
+        
+        const ball = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 10,
+            speedX: ballSpeed,
+            speedY: ballSpeed,
+            color: '#f8fafc',
+            servingPlayer: 1 // 1 或 2
+        };
+        
+        // 陀螺儀數據
+        let tiltX = 0;
+        let tiltY = 0;
         
         // 初始化遊戲
-        async function initGame() {
-            // 嘗試載入手部識別模型
-            try {
-                loadingElement.style.display = 'flex';
-                detectionStatusElement.textContent = "正在載入手部識別模型...";
+        function init() {
+            // 重置分數
+            player1Score = 0;
+            player2Score = 0;
+            roundCount = 0;
+            ballSpeed = 5;
+            
+            // 重置球拍位置
+            player1.y = canvas.height / 2 - player1.height / 2;
+            player2.y = canvas.height / 2 - player2.height / 2;
+            
+            // 重置球位置
+            resetBall();
+            
+            // 更新顯示
+            updateDisplay();
+            
+            // 檢查設備是否支持陀螺儀
+            checkGyroSupport();
+            
+            // 顯示開始畫面
+            document.getElementById('startOverlay').style.display = 'flex';
+            document.getElementById('resultsOverlay').style.display = 'none';
+            
+            // 繪製初始畫面
+            draw();
+            
+            // 更新控制說明
+            updateControlInstructions();
+        }
+        
+        // 檢查設備是否支持陀螺儀
+        function checkGyroSupport() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // iOS 13+ 設備
+                gyroAvailable = true;
+                document.querySelector('.gyro-status').className = 'gyro-status active';
+                document.querySelector('.gyro-status span').textContent = '體感控制: 可用 (需要授權)';
+            } else if ('DeviceOrientationEvent' in window) {
+                // 支持陀螺儀的設備
+                gyroAvailable = true;
+                document.querySelector('.gyro-status').className = 'gyro-status active';
+                document.querySelector('.gyro-status span').textContent = '體感控制: 可用';
+            } else {
+                // 不支持陀螺儀
+                gyroAvailable = false;
+                document.querySelector('.gyro-status').className = 'gyro-status inactive';
+                document.querySelector('.gyro-status span').textContent = '體感控制: 不可用';
                 
-                // 載入Handpose模型
-                handposeModel = await handpose.load();
+                // 如果當前選擇了體感模式，自動切換到滑鼠模式
+                if (controlMode === 'gyro') {
+                    switchControlMode('mouse');
+                }
+            }
+        }
+        
+        // 請求陀螺儀權限 (iOS 13+)
+        function requestGyroPermission() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            // 權限已授予，啟用陀螺儀
+                            setupGyroControls();
+                            document.querySelector('.mobile-tilt-warning').classList.remove('show');
+                        } else {
+                            // 權限被拒絕
+                            alert('體感控制需要設備運動感應器權限。請使用滑鼠或鍵盤控制。');
+                            switchControlMode('mouse');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // 非iOS設備，直接啟用
+                setupGyroControls();
+            }
+        }
+        
+        // 設置陀螺儀控制
+        function setupGyroControls() {
+            if (!gyroAvailable) return;
+            
+            // 添加設備方向事件監聽器
+            window.addEventListener('deviceorientation', handleDeviceOrientation);
+            
+            // 顯示傾斜指示器
+            document.querySelector('.tilt-indicator').classList.add('show');
+            document.querySelector('.calibration-info').classList.add('show');
+            
+            // 校準陀螺儀（將當前位置設為水平）
+            calibrateGyro();
+        }
+        
+        // 處理設備方向事件
+        function handleDeviceOrientation(event) {
+            // 獲取設備傾斜數據
+            tiltX = event.beta; // 前後傾斜 (前傾正，後傾負)
+            tiltY = event.gamma; // 左右傾斜 (右傾正，左傾負)
+            
+            // 更新傾斜指示器
+            document.querySelector('.tilt-value').textContent = Math.round(tiltY) + '°';
+            
+            // 如果遊戲運行中且使用體感控制，更新玩家1位置
+            if (gameRunning && !gamePaused && controlMode === 'gyro') {
+                // 使用傾斜數據控制玩家1球拍
+                // 調整靈敏度和方向
+                const sensitivity = 0.5;
+                let targetY = canvas.height / 2 + (tiltY - gyroCalibrationValue) * sensitivity;
                 
-                loadingElement.style.display = 'none';
-                detectionStatusElement.textContent = "模型載入成功！請啟動攝像頭";
+                // 限制球拍移動範圍
+                targetY = Math.max(player1.height / 2, Math.min(canvas.height - player1.height / 2, targetY));
                 
-                console.log("Handpose模型載入成功");
-            } catch (error) {
-                console.error("無法載入手部識別模型:", error);
-                loadingElement.innerHTML = `
-                    <div style="text-align: center;">
-                        <p style="color: #ff6b6b; margin-bottom: 15px;">無法載入手部識別模型</p>
-                        <p style="color: #aaa; font-size: 0.9rem;">請檢查網絡連接後刷新頁面</p>
+                // 平滑移動
+                player1.y += (targetY - player1.y) * 0.2;
+            }
+        }
+        
+        // 校準陀螺儀
+        function calibrateGyro() {
+            // 將當前傾斜值設為校準值（視為水平位置）
+            gyroCalibrationValue = tiltY || 0;
+            gyroCalibrated = true;
+            
+            // 隱藏校準提示
+            setTimeout(() => {
+                document.querySelector('.calibration-info').classList.remove('show');
+            }, 2000);
+        }
+        
+        // 切換控制模式
+        function switchControlMode(mode) {
+            controlMode = mode;
+            
+            // 更新控制模式選中狀態
+            document.querySelectorAll('.control-mode').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.mode === mode) {
+                    option.classList.add('active');
+                }
+            });
+            
+            // 如果切換到體感模式但未啟用，請求權限
+            if (mode === 'gyro' && gyroAvailable) {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // iOS 13+ 需要請求權限
+                    document.querySelector('.mobile-tilt-warning').classList.add('show');
+                } else {
+                    // 直接啟用陀螺儀
+                    setupGyroControls();
+                }
+            } else if (mode === 'gyro' && !gyroAvailable) {
+                // 設備不支持陀螺儀，自動切換到滑鼠模式
+                alert('您的設備不支持體感控制。已自動切換到滑鼠控制模式。');
+                switchControlMode('mouse');
+            }
+            
+            // 更新控制說明
+            updateControlInstructions();
+        }
+        
+        // 更新控制說明
+        function updateControlInstructions() {
+            let player1Html = '';
+            let player2Html = '';
+            
+            if (controlMode === 'gyro') {
+                player1Html = `
+                    <div class="control-item">
+                        <span>傾斜設備</span>
+                        <span class="key">左/右傾斜</span>
                     </div>
                 `;
-                detectionStatusElement.textContent = "模型載入失敗";
-                detectionStatusElement.style.color = "#ff6b6b";
+                player2Html = `
+                    <div class="control-item">
+                        <span>滑鼠移動</span>
+                        <span class="key">垂直移動</span>
+                    </div>
+                `;
+            } else if (controlMode === 'mouse') {
+                player1Html = `
+                    <div class="control-item">
+                        <span>滑鼠左側</span>
+                        <span class="key">垂直移動</span>
+                    </div>
+                `;
+                player2Html = `
+                    <div class="control-item">
+                        <span>滑鼠右側</span>
+                        <span class="key">垂直移動</span>
+                    </div>
+                `;
+            } else if (controlMode === 'keyboard') {
+                player1Html = `
+                    <div class="control-item">
+                        <span>向上移動</span>
+                        <span class="key">W 鍵</span>
+                    </div>
+                    <div class="control-item">
+                        <span>向下移動</span>
+                        <span class="key">S 鍵</span>
+                    </div>
+                `;
+                player2Html = `
+                    <div class="control-item">
+                        <span>向上移動</span>
+                        <span class="key">↑ 鍵</span>
+                    </div>
+                    <div class="control-item">
+                        <span>向下移動</span>
+                        <span class="key">↓ 鍵</span>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('player1Controls').innerHTML = player1Html;
+            document.getElementById('player2Controls').innerHTML = player2Html;
+        }
+        
+        // 繪製遊戲畫面
+        function draw() {
+            // 清除畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 繪製乒乓球桌
+            drawTable();
+            
+            // 繪製球拍
+            drawPaddle(player1);
+            drawPaddle(player2);
+            
+            // 繪製球
+            drawBall();
+            
+            // 繪製分數
+            drawScore();
+        }
+        
+        // 繪製乒乓球桌
+        function drawTable() {
+            // 繪製桌面
+            ctx.fillStyle = table.color;
+            ctx.fillRect(0, 0, table.width, table.height);
+            
+            // 繪製網格背景
+            drawGridBackground();
+            
+            // 繪製球網
+            ctx.fillStyle = table.net.color;
+            ctx.fillRect(table.net.x - table.net.width / 2, table.net.y, table.net.width, table.net.height);
+            
+            // 繪製球網網格效果
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1;
+            for (let y = 0; y < table.height; y += 20) {
+                ctx.beginPath();
+                ctx.moveTo(table.net.x - table.net.width / 2, y);
+                ctx.lineTo(table.net.x + table.net.width / 2, y);
+                ctx.stroke();
+            }
+            
+            // 繪製桌面邊線
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(5, 5, table.width - 10, table.height - 10);
+            
+            // 繪製中線
+            ctx.beginPath();
+            ctx.moveTo(table.width / 2, 10);
+            ctx.lineTo(table.width / 2, table.height - 10);
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 10]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+        
+        // 繪製網格背景
+        function drawGridBackground() {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            
+            // 垂直線
+            for (let x = 0; x < canvas.width; x += 40) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // 水平線
+            for (let y = 0; y < canvas.height; y += 40) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
             }
         }
         
-        // 啟動攝像頭
-        async function startCamera() {
-            try {
-                detectionStatusElement.textContent = "正在請求攝像頭權限...";
+        // 繪製球拍
+        function drawPaddle(paddle) {
+            // 繪製球拍主體
+            ctx.fillStyle = paddle.color;
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            
+            // 繪製球拍邊框
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
+            
+            // 繪製球拍握把
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(paddle.x + 2, paddle.y + paddle.height / 2 - 10, paddle.width - 4, 20);
+        }
+        
+        // 繪製球
+        function drawBall() {
+            // 繪製球主體
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = ball.color;
+            ctx.fill();
+            
+            // 繪製球的高光效果
+            ctx.beginPath();
+            ctx.arc(ball.x - ball.radius/3, ball.y - ball.radius/3, ball.radius/3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            ctx.fill();
+            
+            // 繪製球的陰影
+            ctx.beginPath();
+            ctx.arc(ball.x + ball.radius/4, ball.y + ball.radius/4, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fill();
+        }
+        
+        // 繪製分數
+        function drawScore() {
+            // 繪製分數背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(canvas.width / 2 - 80, 10, 160, 60);
+            
+            // 繪製分數
+            ctx.font = 'bold 40px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // 玩家1分數
+            ctx.fillStyle = player1.color;
+            ctx.fillText(player1Score.toString(), canvas.width / 2 - 40, 40);
+            
+            // 分數分隔符
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillText(':', canvas.width / 2, 40);
+            
+            // 玩家2分數
+            ctx.fillStyle = player2.color;
+            ctx.fillText(player2Score.toString(), canvas.width / 2 + 40, 40);
+        }
+        
+        // 更新遊戲邏輯
+        function update() {
+            if (!gameRunning || gamePaused || gameOver) return;
+            
+            // 移動球
+            ball.x += ball.speedX;
+            ball.y += ball.speedY;
+            
+            // 球與上下邊界碰撞
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+                ball.speedY = -ball.speedY;
+            }
+            
+            // 球與球拍碰撞檢測
+            // 玩家1球拍
+            if (
+                ball.x - ball.radius < player1.x + player1.width &&
+                ball.x - ball.radius > player1.x &&
+                ball.y + ball.radius > player1.y &&
+                ball.y - ball.radius < player1.y + player1.height
+            ) {
+                // 計算擊中球拍的位置（-1到1，-1為頂部，1為底部）
+                const hitPosition = (ball.y - (player1.y + player1.height / 2)) / (player1.height / 2);
                 
-                // 請求攝像頭訪問權限
-                videoStream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'user',
-                        width: { ideal: 640 },
-                        height: { ideal: 480 }
-                    },
-                    audio: false
-                });
+                // 根據擊中位置調整反彈角度
+                const angle = hitPosition * (Math.PI / 4);
                 
-                // 將視頻流設定到video元素
-                videoElement.srcObject = videoStream;
+                // 計算新的速度
+                ball.speedX = Math.abs(ball.speedX) * 1.05; // 增加一點速度
+                ball.speedY = ball.speed * Math.sin(angle);
                 
-                // 等待視頻載入
-                await new Promise((resolve) => {
-                    videoElement.onloadedmetadata = () => {
-                        resolve();
-                    };
-                });
+                // 確保球向右移動
+                ball.speedX = Math.abs(ball.speedX);
                 
-                // 設定canvas尺寸與視頻一致
-                canvasElement.width = videoElement.videoWidth;
-                canvasElement.height = videoElement.videoHeight;
+                // 將球移動到球拍右側，避免重複碰撞
+                ball.x = player1.x + player1.width + ball.radius;
+            }
+            
+            // 玩家2球拍
+            if (
+                ball.x + ball.radius > player2.x &&
+                ball.x + ball.radius < player2.x + player2.width &&
+                ball.y + ball.radius > player2.y &&
+                ball.y - ball.radius < player2.y + player2.height
+            ) {
+                // 計算擊中球拍的位置（-1到1，-1為頂部，1為底部）
+                const hitPosition = (ball.y - (player2.y + player2.height / 2)) / (player2.height / 2);
                 
-                detectionStatusElement.textContent = "攝像頭已啟動，正在檢測手部...";
-                detectionStatusElement.classList.add('active');
+                // 根據擊中位置調整反彈角度
+                const angle = hitPosition * (Math.PI / 4);
                 
-                // 啟用/禁用按鈕
-                startButton.disabled = true;
-                stopButton.disabled = false;
-                gameButton.disabled = false;
+                // 計算新的速度
+                ball.speedX = -Math.abs(ball.speedX) * 1.05; // 增加一點速度
+                ball.speedY = ball.speed * Math.sin(angle);
                 
-                // 開始手部檢測
-                detectHands();
+                // 確保球向左移動
+                ball.speedX = -Math.abs(ball.speedX);
                 
-            } catch (error) {
-                console.error("無法訪問攝像頭:", error);
-                detectionStatusElement.textContent = "無法訪問攝像頭，請檢查權限";
-                detectionStatusElement.style.color = "#ff6b6b";
+                // 將球移動到球拍左側，避免重複碰撞
+                ball.x = player2.x - ball.radius;
+            }
+            
+            // 球出界檢測（得分）
+            if (ball.x - ball.radius < 0) {
+                // 玩家2得分
+                player2Score++;
+                updateDisplay();
+                resetBall();
+                ball.servingPlayer = 1; // 換玩家1發球
+                checkGameOver();
+            } else if (ball.x + ball.radius > canvas.width) {
+                // 玩家1得分
+                player1Score++;
+                updateDisplay();
+                resetBall();
+                ball.servingPlayer = 2; // 換玩家2發球
+                checkGameOver();
+            }
+            
+            // 根據控制模式更新球拍位置
+            updatePaddles();
+            
+            // 更新球速顯示
+            updateBallSpeedDisplay();
+            
+            // 繪製遊戲
+            draw();
+        }
+        
+        // 更新球拍位置
+        function updatePaddles() {
+            // 玩家2控制（根據控制模式）
+            if (controlMode === 'mouse' || controlMode === 'gyro') {
+                // 滑鼠控制玩家2（或玩家1在非體感模式下）
+                // 滑鼠移動事件已在事件監聽器中處理
+            } else if (controlMode === 'keyboard') {
+                // 鍵盤控制已在事件監聽器中處理
+            }
+            
+            // 限制球拍移動範圍
+            player1.y = Math.max(0, Math.min(canvas.height - player1.height, player1.y));
+            player2.y = Math.max(0, Math.min(canvas.height - player2.height, player2.y));
+        }
+        
+        // 更新球速顯示
+        function updateBallSpeedDisplay() {
+            // 每5分增加球速
+            const totalScore = player1Score + player2Score;
+            if (totalScore > 0 && totalScore % 5 === 0 && totalScore / 5 > roundCount) {
+                roundCount = totalScore / 5;
+                ballSpeed += 1;
+                
+                // 更新球速顯示
+                let speedText = '';
+                if (ballSpeed <= 6) speedText = '慢速';
+                else if (ballSpeed <= 8) speedText = '正常';
+                else if (ballSpeed <= 10) speedText = '快速';
+                else speedText = '極速';
+                
+                document.getElementById('ballSpeed').textContent = speedText;
             }
         }
         
-        // 停止攝像頭
-        function stopCamera() {
-            if (videoStream) {
-                // 停止所有視頻軌道
-                videoStream.getTracks().forEach(track => track.stop());
-                videoStream = null;
-            }
+        // 重置球位置
+        function resetBall() {
+            ball.x = canvas.width / 2;
+            ball.y = canvas.height / 2;
             
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-            
-            // 清除canvas
-            canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            
-            // 重置視頻元素
-            videoElement.srcObject = null;
-            
-            detectionStatusElement.textContent = "攝像頭已停止";
-            detectionStatusElement.classList.remove('active');
-            
-            // 重置手勢檢測狀態
-            playerStatusElement.textContent = "攝像頭已停止";
-            playerGestureIcon.textContent = "?";
-            playerGestureElement.classList.remove('active');
-            
-            // 啟用/禁用按鈕
-            startButton.disabled = false;
-            stopButton.disabled = true;
-            gameButton.disabled = true;
-        }
-        
-        // 檢測手部
-        async function detectHands() {
-            if (!handposeModel || !videoStream) return;
-            
-            // 預測手部位置
-            const predictions = await handposeModel.estimateHands(videoElement);
-            
-            // 清除canvas
-            canvasContext.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            
-            // 如果有檢測到手部
-            if (predictions.length > 0) {
-                detectionStatusElement.textContent = "已檢測到手部";
-                
-                // 獲取手部關鍵點
-                const hand = predictions[0];
-                
-                // 繪製手部關鍵點
-                drawHand(hand.landmarks);
-                
-                // 識別手勢
-                const gesture = recognizeGesture(hand.landmarks);
-                
-                // 更新玩家手勢顯示
-                updatePlayerGesture(gesture);
+            // 根據發球玩家決定發球方向
+            if (ball.servingPlayer === 1) {
+                ball.speedX = ballSpeed;
             } else {
-                detectionStatusElement.textContent = "未檢測到手部，請將手放在鏡頭前";
-                playerStatusElement.textContent = "未檢測到手部";
-                playerGestureIcon.textContent = "?";
-                playerGestureElement.classList.remove('active');
+                ball.speedX = -ballSpeed;
             }
             
-            // 繼續下一幀檢測
-            animationFrameId = requestAnimationFrame(detectHands);
-        }
-        
-        // 繪製手部關鍵點
-        function drawHand(landmarks) {
-            // 繪製關鍵點
-            for (let i = 0; i < landmarks.length; i++) {
-                const [x, y] = landmarks[i];
-                
-                // 繪製點
-                canvasContext.beginPath();
-                canvasContext.arc(x, y, 5, 0, 2 * Math.PI);
-                canvasContext.fillStyle = '#6c63ff';
-                canvasContext.fill();
-                
-                // 繪製編號（除錯用）
-                canvasContext.font = '12px Arial';
-                canvasContext.fillStyle = 'white';
-                canvasContext.fillText(i, x + 8, y + 3);
-            }
+            // 隨機垂直速度
+            ball.speedY = (Math.random() - 0.5) * ballSpeed;
             
-            // 繪製關鍵點之間的連接線
-            const fingerConnections = [
-                [0, 1], [1, 2], [2, 3], [3, 4], // 拇指
-                [0, 5], [5, 6], [6, 7], [7, 8], // 食指
-                [0, 9], [9, 10], [10, 11], [11, 12], // 中指
-                [0, 13], [13, 14], [14, 15], [15, 16], // 無名指
-                [0, 17], [17, 18], [18, 19], [19, 20], // 小指
-                [5, 9], [9, 13], [13, 17] // 手掌底部
-            ];
-            
-            canvasContext.strokeStyle = '#ffd166';
-            canvasContext.lineWidth = 2;
-            
-            for (const [start, end] of fingerConnections) {
-                const [x1, y1] = landmarks[start];
-                const [x2, y2] = landmarks[end];
-                
-                canvasContext.beginPath();
-                canvasContext.moveTo(x1, y1);
-                canvasContext.lineTo(x2, y2);
-                canvasContext.stroke();
+            // 確保球速至少為最小速度
+            const minSpeed = 3;
+            if (Math.abs(ball.speedY) < minSpeed) {
+                ball.speedY = ball.speedY > 0 ? minSpeed : -minSpeed;
             }
         }
         
-        // 識別手勢（簡化版）
-        function recognizeGesture(landmarks) {
-            // 簡化手勢識別邏輯
-            // 這裡使用一個簡化的方法：根據指尖與手掌的距離來判斷手指是否伸直
-            
-            // 手掌基準點（手腕）
-            const wrist = landmarks[0];
-            
-            // 各手指指尖的索引
-            const fingerTips = [4, 8, 12, 16, 20]; // 拇指、食指、中指、無名指、小指
-            const fingerBases = [2, 5, 9, 13, 17]; // 各手指的根部
-            
-            let extendedFingers = 0;
-            
-            // 檢查每個手指是否伸直
-            for (let i = 0; i < fingerTips.length; i++) {
-                const tip = landmarks[fingerTips[i]];
-                const base = landmarks[fingerBases[i]];
-                
-                // 計算指尖到手掌的距離
-                const tipToWristDistance = distance(tip, wrist);
-                const baseToWristDistance = distance(base, wrist);
-                
-                // 如果指尖距離手腕比根部距離手腕遠很多，則認為手指是伸直的
-                // 對於拇指需要特殊處理
-                if (i === 0) {
-                    // 拇指的判斷邏輯
-                    if (tipToWristDistance > baseToWristDistance * 1.3) {
-                        extendedFingers++;
-                    }
-                } else {
-                    if (tipToWristDistance > baseToWristDistance * 1.5) {
-                        extendedFingers++;
-                    }
-                }
+        // 檢查遊戲是否結束
+        function checkGameOver() {
+            if (player1Score >= maxScore || player2Score >= maxScore) {
+                gameOver = true;
+                showGameResults();
             }
+        }
+        
+        // 顯示遊戲結果
+        function showGameResults() {
+            document.getElementById('player1Score').textContent = player1Score;
+            document.getElementById('player2Score').textContent = player2Score;
             
-            // 根據伸直的手指數量判斷手勢
-            if (extendedFingers === 0) {
-                return 'rock'; // 石頭
-            } else if (extendedFingers === 2 && 
-                      landmarks[8][1] < landmarks[6][1] && // 食指伸直
-                      landmarks[12][1] < landmarks[10][1]) { // 中指伸直
-                return 'scissors'; // 剪刀
-            } else if (extendedFingers >= 4) {
-                return 'paper'; // 布
+            let winnerMessage = '';
+            if (player1Score > player2Score) {
+                winnerMessage = '<span class="winner">玩家1 獲勝！</span>';
             } else {
-                return 'unknown'; // 未知手勢
+                winnerMessage = '<span class="winner">玩家2 獲勝！</span>';
             }
+            
+            document.getElementById('winnerMessage').innerHTML = winnerMessage;
+            document.getElementById('resultsOverlay').style.display = 'flex';
         }
         
-        // 計算兩點之間的距離
-        function distance(point1, point2) {
-            const dx = point1[0] - point2[0];
-            const dy = point1[1] - point2[1];
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-        
-        // 更新玩家手勢顯示
-        function updatePlayerGesture(gesture) {
-            const currentTime = Date.now();
-            
-            // 為了避免手勢頻繁變化，我們需要手勢穩定一段時間
-            if (gesture === stableGesture) {
-                gestureStableCount++;
-            } else {
-                stableGesture = gesture;
-                gestureStableCount = 1;
-            }
-            
-            // 如果手勢穩定超過5幀，則更新顯示
-            if (gestureStableCount > 5) {
-                playerGesture = gesture;
-                
-                // 更新UI
-                if (gesture === 'rock') {
-                    playerGestureIcon.textContent = '✊';
-                    playerStatusElement.textContent = '石頭';
-                    playerGestureElement.classList.add('active');
-                } else if (gesture === 'paper') {
-                    playerGestureIcon.textContent = '✋';
-                    playerStatusElement.textContent = '布';
-                    playerGestureElement.classList.add('active');
-                } else if (gesture === 'scissors') {
-                    playerGestureIcon.textContent = '✌️';
-                    playerStatusElement.textContent = '剪刀';
-                    playerGestureElement.classList.add('active');
-                } else {
-                    playerGestureIcon.textContent = '?';
-                    playerStatusElement.textContent = '未知手勢';
-                    playerGestureElement.classList.remove('active');
-                }
-            }
-            
-            // 如果遊戲正在進行且倒數中，則記錄最後的手勢
-            if (countdownActive && currentTime > lastGestureTime + 100) {
-                lastGestureTime = currentTime;
-                
-                // 在倒數的最後0.5秒鎖定玩家手勢
-                if (countdownValue === 0 && gesture !== 'unknown') {
-                    playerGesture = gesture;
-                }
-            }
+        // 更新顯示
+        function updateDisplay() {
+            document.getElementById('scorePlayer1').textContent = player1Score;
+            document.getElementById('scorePlayer2').textContent = player2Score;
+            document.getElementById('roundCount').textContent = player1Score + player2Score;
         }
         
         // 開始遊戲
         function startGame() {
-            if (!videoStream || gameActive) return;
+            // 如果選擇體感模式但未啟用，請求權限
+            if (controlMode === 'gyro' && gyroAvailable) {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    // iOS 13+ 需要請求權限
+                    requestGyroPermission();
+                    return;
+                }
+            }
             
-            gameActive = true;
-            countdownActive = true;
-            countdownValue = 3;
+            // 顯示倒計時
+            showCountdown();
+        }
+        
+        // 顯示倒計時
+        function showCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            countdownElement.style.display = 'block';
             
-            // 重置手勢
-            playerGesture = null;
-            aiGesture = null;
-            aiGestureIcon.textContent = '?';
-            aiStatusElement.textContent = '等待玩家手勢';
-            aiGestureElement.classList.remove('active');
+            let count = 3;
+            countdownElement.textContent = count;
             
-            // 禁用遊戲按鈕
-            gameButton.disabled = true;
-            
-            // 開始倒數
-            countdownElement.textContent = countdownValue;
-            gameResultElement.textContent = "準備！";
-            
-            countdownInterval = setInterval(() => {
-                countdownValue--;
-                countdownElement.textContent = countdownValue;
-                
-                if (countdownValue === 0) {
-                    // 倒數結束，顯示結果
-                    clearInterval(countdownInterval);
-                    countdownActive = false;
-                    
-                    // 如果玩家沒有手勢，使用最後檢測到的手勢
-                    if (!playerGesture) {
-                        playerGesture = stableGesture || 'unknown';
-                    }
-                    
-                    // 生成電腦手勢
-                    generateAiGesture();
-                    
-                    // 判斷勝負
-                    determineWinner();
-                    
-                    // 啟用遊戲按鈕
+            const countdownInterval = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownElement.textContent = count;
+                } else {
+                    countdownElement.textContent = '開始！';
                     setTimeout(() => {
-                        gameButton.disabled = false;
-                        gameActive = false;
-                    }, 3000);
-                } else if (countdownValue > 0) {
-                    gameResultElement.textContent = countdownValue === 1 ? "出拳！" : countdownValue + "...";
+                        countdownElement.style.display = 'none';
+                        
+                        // 開始遊戲
+                        gameRunning = true;
+                        gamePaused = false;
+                        gameOver = false;
+                        document.getElementById('startOverlay').style.display = 'none';
+                        
+                        // 如果是體感模式，設置陀螺儀控制
+                        if (controlMode === 'gyro' && gyroAvailable) {
+                            setupGyroControls();
+                        }
+                        
+                        clearInterval(countdownInterval);
+                    }, 500);
                 }
             }, 1000);
         }
         
-        // 生成電腦手勢
-        function generateAiGesture() {
-            const gestures = ['rock', 'paper', 'scissors'];
-            const randomIndex = Math.floor(Math.random() * 3);
-            aiGesture = gestures[randomIndex];
+        // 暫停/繼續遊戲
+        function togglePause() {
+            if (!gameRunning) return;
             
-            // 更新UI
-            if (aiGesture === 'rock') {
-                aiGestureIcon.textContent = '✊';
-                aiStatusElement.textContent = '石頭';
-            } else if (aiGesture === 'paper') {
-                aiGestureIcon.textContent = '✋';
-                aiStatusElement.textContent = '布';
-            } else {
-                aiGestureIcon.textContent = '✌️';
-                aiStatusElement.textContent = '剪刀';
-            }
-            
-            aiGestureElement.classList.add('active');
+            gamePaused = !gamePaused;
+            document.getElementById('pauseBtn').innerHTML = gamePaused ? 
+                '<i class="fas fa-play"></i> 繼續遊戲' : 
+                '<i class="fas fa-pause"></i> 暫停遊戲';
         }
         
-        // 判斷勝負
-        function determineWinner() {
-            // 如果玩家手勢未知，視為無效
-            if (playerGesture === 'unknown') {
-                gameResultElement.textContent = "無法識別您的手勢！";
-                return;
-            }
-            
-            // 判斷勝負
-            let result = '';
-            
-            if (playerGesture === aiGesture) {
-                result = "平局！";
-                scores.draw++;
-            } else if (
-                (playerGesture === 'rock' && aiGesture === 'scissors') ||
-                (playerGesture === 'paper' && aiGesture === 'rock') ||
-                (playerGesture === 'scissors' && aiGesture === 'paper')
-            ) {
-                result = "玩家贏了！";
-                scores.player++;
-            } else {
-                result = "電腦贏了！";
-                scores.ai++;
-            }
-            
-            gameResultElement.textContent = result;
-            
-            // 更新分數顯示
-            updateScores();
-            
-            // 記錄遊戲歷史
-            recordGameHistory(result);
-        }
-        
-        // 更新分數顯示
-        function updateScores() {
-            playerScoreElement.textContent = scores.player;
-            aiScoreElement.textContent = scores.ai;
-            drawScoreElement.textContent = scores.draw;
-        }
-        
-        // 記錄遊戲歷史
-        function recordGameHistory(result) {
-            // 獲取手勢顯示名稱
-            const getGestureName = (gesture) => {
-                if (gesture === 'rock') return '✊ 石頭';
-                if (gesture === 'paper') return '✋ 布';
-                if (gesture === 'scissors') return '✌️ 剪刀';
-                return '? 未知';
-            };
-            
-            const playerGestureName = getGestureName(playerGesture);
-            const aiGestureName = getGestureName(aiGesture);
-            
-            // 創建歷史記錄項目
-            const historyItem = document.createElement('div');
-            historyItem.classList.add('history-item');
-            
-            // 根據結果添加樣式
-            if (result.includes("玩家贏了")) {
-                historyItem.innerHTML = `
-                    <span class="history-winner">玩家 ${playerGestureName}</span>
-                    <span> vs </span>
-                    <span class="history-looser">電腦 ${aiGestureName}</span>
-                `;
-            } else if (result.includes("電腦贏了")) {
-                historyItem.innerHTML = `
-                    <span class="history-looser">玩家 ${playerGestureName}</span>
-                    <span> vs </span>
-                    <span class="history-winner">電腦 ${aiGestureName}</span>
-                `;
-            } else {
-                historyItem.innerHTML = `
-                    <span>玩家 ${playerGestureName}</span>
-                    <span> vs </span>
-                    <span>電腦 ${aiGestureName}</span>
-                `;
-            }
-            
-            // 添加到歷史列表
-            if (historyListElement.firstChild && historyListElement.firstChild.textContent === "遊戲尚未開始") {
-                historyListElement.innerHTML = '';
-            }
-            
-            historyListElement.insertBefore(historyItem, historyListElement.firstChild);
-            
-            // 限制歷史記錄數量
-            if (historyListElement.children.length > 10) {
-                historyListElement.removeChild(historyListElement.lastChild);
-            }
+        // 重置遊戲
+        function resetGame() {
+            init();
         }
         
         // 事件監聽器
-        startButton.addEventListener('click', startCamera);
-        stopButton.addEventListener('click', stopCamera);
-        gameButton.addEventListener('click', startGame);
-        
-        // 初始化遊戲
-        initGame();
-        
-        // 頁面卸載時停止攝像頭
-        window.addEventListener('beforeunload', () => {
-            if (videoStream) {
-                stopCamera();
+        // 滑鼠控制
+        canvas.addEventListener('mousemove', (e) => {
+            if (!gameRunning || gamePaused) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const scaleY = canvas.height / rect.height;
+            const mouseY = (e.clientY - rect.top) * scaleY;
+            
+            // 根據控制模式處理滑鼠移動
+            if (controlMode === 'mouse') {
+                // 滑鼠控制兩側球拍
+                if (e.clientX - rect.left < rect.width / 2) {
+                    // 左側控制玩家1
+                    player1.y = mouseY - player1.height / 2;
+                } else {
+                    // 右側控制玩家2
+                    player2.y = mouseY - player2.height / 2;
+                }
+            } else if (controlMode === 'gyro') {
+                // 體感模式下，滑鼠只控制玩家2
+                player2.y = mouseY - player2.height / 2;
             }
         });
+        
+        // 鍵盤控制
+        const keys = {
+            w: false,
+            s: false,
+            ArrowUp: false,
+            ArrowDown: false
+        };
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = true;
+            }
+            
+            // 空格鍵暫停/繼續
+            if (e.key === ' ' && gameRunning) {
+                e.preventDefault();
+                togglePause();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            if (e.key in keys) {
+                keys[e.key] = false;
+            }
+        });
+        
+        // 鍵盤控制更新循環
+        function updateKeyboardControls() {
+            if (!gameRunning || gamePaused || controlMode !== 'keyboard') return;
+            
+            // 玩家1控制 (W/S)
+            if (keys.w) player1.y -= player1.speed;
+            if (keys.s) player1.y += player1.speed;
+            
+            // 玩家2控制 (↑/↓)
+            if (keys.ArrowUp) player2.y -= player2.speed;
+            if (keys.ArrowDown) player2.y += player2.speed;
+        }
+        
+        // 按鈕事件
+        document.getElementById('startButton').addEventListener('click', startGame);
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('pauseBtn').addEventListener('click', togglePause);
+        document.getElementById('resetBtn').addEventListener('click', resetGame);
+        document.getElementById('restartButton').addEventListener('click', resetGame);
+        
+        // 控制模式選擇
+        document.querySelectorAll('.control-mode').forEach(option => {
+            option.addEventListener('click', () => {
+                switchControlMode(option.dataset.mode);
+            });
+        });
+        
+        // 遊戲循環
+        function gameLoop() {
+            update();
+            updateKeyboardControls();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 初始化遊戲
+        init();
+        
+        // 啟動遊戲循環
+        gameLoop();
     </script>
 </body>
 </html>

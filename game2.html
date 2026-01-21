@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>传统中国象棋 - 已修复</title>
+    <title>传统中国象棋 - 已修复棋子移动问题</title>
     <style>
+        /* 样式保持不变 */
         * {
             margin: 0;
             padding: 0;
@@ -371,10 +372,11 @@
             gameStarted: false,
             selectedPiece: null,
             moveHistory: [],
-            aiThinking: false
+            aiThinking: false,
+            originalBoard: null // 保存初始棋盘状态
         };
 
-        // 棋盘和棋子常量 - 修复：中国象棋棋盘是10行9列
+        // 棋盘和棋子常量
         const ROWS = 10;
         const COLS = 9;
         const CELL_SIZE = 70;
@@ -393,7 +395,7 @@
         
         // 初始化棋盘
         function initBoard() {
-            // 创建空棋盘 - 修复：使用正确的行列数
+            // 创建空棋盘
             gameState.board = Array(ROWS).fill().map(() => Array(COLS).fill(null));
             
             // 放置黑方棋子
@@ -432,6 +434,9 @@
             gameState.board[6][6] = {type: PIECE_TYPES.PAWN, color: 'red'};
             gameState.board[6][8] = {type: PIECE_TYPES.PAWN, color: 'red'};
             
+            // 保存初始棋盘状态
+            gameState.originalBoard = JSON.parse(JSON.stringify(gameState.board));
+            
             // 重置游戏状态
             gameState.currentPlayer = 'red';
             gameState.selectedPiece = null;
@@ -442,6 +447,25 @@
             
             // 添加调试信息
             logDebug('棋盘初始化完成，红方先走');
+        }
+        
+        // 恢复初始棋盘
+        function restoreOriginalBoard() {
+            gameState.board = JSON.parse(JSON.stringify(gameState.originalBoard));
+            gameState.currentPlayer = 'red';
+            gameState.selectedPiece = null;
+            gameState.moveHistory = [];
+            gameState.aiThinking = false;
+            gameState.gameStarted = true;
+            
+            drawBoard();
+            updateStatus();
+            logDebug('恢复到初始棋盘状态');
+            
+            // 如果是人机模式，红方先走
+            if (gameState.gameMode === 'ai') {
+                logDebug('人机模式，红方先走');
+            }
         }
         
         // 绘制棋盘
@@ -578,20 +602,21 @@
             ctx.fillText(piece.type, x, y);
         }
         
-        // 获取棋子的合法移动 - 修复移动规则
+        // 获取棋子的合法移动
         function getValidMoves(row, col, board) {
             const piece = board[row][col];
             if (!piece) {
-                logDebug(`错误：位置 (${row}, ${col}) 没有棋子`);
                 return [];
             }
             
             const moves = [];
             const color = piece.color;
             
+            // 定义四个基本方向
+            const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            
             switch (piece.type) {
                 case PIECE_TYPES.KING: // 将/帅
-                    // 只能走一步，九宫格内
                     const kingMoves = [[-1, 0], [1, 0], [0, -1], [0, 1]];
                     for (const [dr, dc] of kingMoves) {
                         const newRow = row + dr;
@@ -600,10 +625,8 @@
                         // 检查是否在九宫格内
                         let inPalace = false;
                         if (color === 'red') {
-                            // 红方九宫格：行7-9，列3-5
                             inPalace = (newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5);
                         } else {
-                            // 黑方九宫格：行0-2，列3-5
                             inPalace = (newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5);
                         }
                         
@@ -617,7 +640,6 @@
                     break;
                     
                 case PIECE_TYPES.GUARD: // 士/仕
-                    // 走斜线，一步，九宫格内
                     const guardMoves = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
                     for (const [dr, dc] of guardMoves) {
                         const newRow = row + dr;
@@ -641,7 +663,6 @@
                     break;
                     
                 case PIECE_TYPES.ELEPHANT: // 象/相
-                    // 走田字，不能过河
                     const elephantMoves = [[-2, -2], [-2, 2], [2, -2], [2, 2]];
                     for (const [dr, dc] of elephantMoves) {
                         const newRow = row + dr;
@@ -657,7 +678,7 @@
                             notCrossRiver = newRow <= 4;  // 黑象不能过河
                         }
                         
-                        if (notCrossRiver && isWithinBoard(newRow, newCol) && !board[blockRow][blockCol]) {
+                        if (notCrossRiver && isWithinBoard(newRow, newCol) && isWithinBoard(blockRow, blockCol) && !board[blockRow][blockCol]) {
                             const targetPiece = board[newRow][newCol];
                             if (!targetPiece || targetPiece.color !== color) {
                                 moves.push({row: newRow, col: newCol});
@@ -667,7 +688,6 @@
                     break;
                     
                 case PIECE_TYPES.HORSE: // 马
-                    // 走日字，有蹩马腿
                     const horseMoves = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]];
                     for (const [dr, dc] of horseMoves) {
                         const newRow = row + dr;
@@ -697,8 +717,6 @@
                     break;
                     
                 case PIECE_TYPES.CHARIOT: // 车
-                    // 走直线，不限步数，不能穿过其他棋子
-                    const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
                     for (const [dr, dc] of directions) {
                         for (let i = 1; i < Math.max(ROWS, COLS); i++) {
                             const newRow = row + dr * i;
@@ -720,7 +738,6 @@
                     break;
                     
                 case PIECE_TYPES.CANNON: // 炮
-                    // 走直线，吃子需要隔一个棋子
                     for (const [dr, dc] of directions) {
                         let hasJumped = false;
                         for (let i = 1; i < Math.max(ROWS, COLS); i++) {
@@ -749,7 +766,6 @@
                     break;
                     
                 case PIECE_TYPES.PAWN: // 兵/卒
-                    // 红兵向下走，黑卒向上走
                     const forwardDir = color === 'red' ? -1 : 1;
                     const pawnMoves = [[forwardDir, 0]];
                     
@@ -776,7 +792,7 @@
             return moves;
         }
         
-        // 检查坐标是否在棋盘内 - 修复：使用正确的行列数
+        // 检查坐标是否在棋盘内
         function isWithinBoard(row, col) {
             return row >= 0 && row < ROWS && col >= 0 && col < COLS;
         }
@@ -860,15 +876,16 @@
             
             // 如果是人机模式且轮到电脑走棋
             if (gameState.gameMode === 'ai' && gameState.currentPlayer === 'black' && gameState.gameStarted) {
-                setTimeout(makeAIMove, 500);
+                // 延迟一点时间让用户看到自己的移动
+                setTimeout(makeAIMove, 100);
             }
         }
         
-        // 事件处理 - 修复：正确计算点击位置
+        // 事件处理
         function setupEventListeners() {
             const canvas = document.getElementById('chessboard');
             
-            // 棋盘点击事件 - 修复：正确计算行列
+            // 棋盘点击事件
             canvas.addEventListener('click', (e) => {
                 if (!gameState.gameStarted || gameState.aiThinking) {
                     logDebug('游戏未开始或电脑正在思考');
@@ -986,6 +1003,7 @@
         
         // 设置游戏模式
         function setGameMode(mode) {
+            const oldMode = gameState.gameMode;
             gameState.gameMode = mode;
             
             // 更新按钮状态
@@ -996,7 +1014,25 @@
             const difficultySection = document.getElementById('difficulty-section');
             difficultySection.style.display = mode === 'ai' ? 'block' : 'none';
             
-            updateStatus();
+            // 如果从双人模式切换到人机模式，自动恢复到初始棋盘
+            if (oldMode === 'two-player' && mode === 'ai') {
+                if (confirm('切换到人机模式将重置游戏到初始状态，是否继续？')) {
+                    restoreOriginalBoard();
+                } else {
+                    // 如果用户取消，恢复原来的模式
+                    gameState.gameMode = oldMode;
+                    document.getElementById('two-player-mode').classList.toggle('active', oldMode === 'two-player');
+                    document.getElementById('ai-mode').classList.toggle('active', oldMode === 'ai');
+                    difficultySection.style.display = oldMode === 'ai' ? 'block' : 'none';
+                    return;
+                }
+            }
+            
+            // 如果游戏已经开始了，更新状态
+            if (gameState.gameStarted) {
+                updateStatus();
+            }
+            
             logDebug(`游戏模式设置为: ${mode}`);
         }
         
@@ -1010,6 +1046,11 @@
             document.getElementById('hard').classList.toggle('active', difficulty === 'hard');
             
             logDebug(`难度设置为: ${difficulty}`);
+            
+            // 如果是人机模式且游戏已经开始，立即重置游戏
+            if (gameState.gameMode === 'ai' && gameState.gameStarted) {
+                restoreOriginalBoard();
+            }
         }
         
         // 开始游戏
@@ -1030,7 +1071,8 @@
             
             // 如果人机模式且电脑先走（黑方），则让电脑走棋
             if (gameState.gameMode === 'ai' && gameState.currentPlayer === 'black') {
-                setTimeout(makeAIMove, 500);
+                // 给用户一点时间看到游戏开始
+                setTimeout(makeAIMove, 300);
             }
         }
         
@@ -1065,7 +1107,7 @@
             logDebug(`悔棋: 从(${lastMove.toRow}, ${lastMove.toCol})回到(${lastMove.fromRow}, ${lastMove.fromCol})`);
         }
         
-        // AI走棋（简化版）
+        // 优化的AI走棋函数 - 大幅减少思考时间
         function makeAIMove() {
             if (!gameState.gameStarted || gameState.currentPlayer !== 'black' || gameState.gameMode !== 'ai') {
                 return;
@@ -1075,44 +1117,149 @@
             updateStatus();
             logDebug('AI开始思考...');
             
-            // 根据难度设置AI思考时间
-            const thinkTime = gameState.difficulty === 'easy' ? 1000 : 
-                             gameState.difficulty === 'medium' ? 700 : 300;
-            
+            // 使用立即执行，几乎无延迟
             setTimeout(() => {
-                // 获取所有可能的走法
-                const moves = [];
-                for (let row = 0; row < ROWS; row++) {
-                    for (let col = 0; col < COLS; col++) {
-                        const piece = gameState.board[row][col];
-                        if (piece && piece.color === 'black') {
-                            const pieceMoves = getValidMoves(row, col, gameState.board);
-                            for (const move of pieceMoves) {
-                                moves.push({
-                                    fromRow: row,
-                                    fromCol: col,
-                                    toRow: move.row,
-                                    toCol: move.col
-                                });
+                try {
+                    // 获取所有可能的走法
+                    const moves = [];
+                    for (let row = 0; row < ROWS; row++) {
+                        for (let col = 0; col < COLS; col++) {
+                            const piece = gameState.board[row][col];
+                            if (piece && piece.color === 'black') {
+                                const pieceMoves = getValidMoves(row, col, gameState.board);
+                                for (const move of pieceMoves) {
+                                    moves.push({
+                                        fromRow: row,
+                                        fromCol: col,
+                                        toRow: move.row,
+                                        toCol: move.col,
+                                        pieceType: piece.type
+                                    });
+                                }
                             }
                         }
                     }
-                }
-                
-                if (moves.length === 0) {
+                    
+                    if (moves.length === 0) {
+                        gameState.aiThinking = false;
+                        updateStatus();
+                        return;
+                    }
+                    
+                    // 根据难度选择走法 - 优化算法效率
+                    let chosenMove;
+                    
+                    if (gameState.difficulty === 'easy') {
+                        // 简单：随机走法，但优先吃子
+                        const capturingMoves = moves.filter(move => gameState.board[move.toRow][move.toCol]);
+                        if (capturingMoves.length > 0) {
+                            chosenMove = capturingMoves[Math.floor(Math.random() * capturingMoves.length)];
+                        } else {
+                            chosenMove = moves[Math.floor(Math.random() * moves.length)];
+                        }
+                    } else if (gameState.difficulty === 'medium') {
+                        // 中等：快速评估，优先吃子
+                        const ratedMoves = moves.map(move => {
+                            let score = 0;
+                            const targetPiece = gameState.board[move.toRow][move.toCol];
+                            
+                            // 吃子得分
+                            if (targetPiece) {
+                                const pieceValue = {
+                                    [PIECE_TYPES.KING]: 1000,
+                                    [PIECE_TYPES.CHARIOT]: 9,
+                                    [PIECE_TYPES.CANNON]: 7,
+                                    [PIECE_TYPES.HORSE]: 6,
+                                    [PIECE_TYPES.ELEPHANT]: 2,
+                                    [PIECE_TYPES.GUARD]: 2,
+                                    [PIECE_TYPES.PAWN]: 3
+                                };
+                                score += pieceValue[targetPiece.type] || 0;
+                            }
+                            
+                            // 向前移动（对黑方来说是向下）得分
+                            if (move.toRow > move.fromRow) score += 1;
+                            
+                            // 中心控制得分
+                            if (move.toCol >= 3 && move.toCol <= 5) score += 1;
+                            
+                            return {move, score};
+                        });
+                        
+                        // 快速排序并选择高分走法
+                        ratedMoves.sort((a, b) => b.score - a.score);
+                        const topMoves = ratedMoves.slice(0, Math.min(5, ratedMoves.length));
+                        chosenMove = topMoves[Math.floor(Math.random() * topMoves.length)].move;
+                    } else {
+                        // 困难：稍微复杂的评估
+                        const ratedMoves = moves.map(move => {
+                            let score = 0;
+                            const targetPiece = gameState.board[move.toRow][move.toCol];
+                            
+                            // 吃子得分
+                            if (targetPiece) {
+                                const pieceValue = {
+                                    [PIECE_TYPES.KING]: 1000,
+                                    [PIECE_TYPES.CHARIOT]: 9,
+                                    [PIECE_TYPES.CANNON]: 7,
+                                    [PIECE_TYPES.HORSE]: 6,
+                                    [PIECE_TYPES.ELEPHANT]: 2,
+                                    [PIECE_TYPES.GUARD]: 2,
+                                    [PIECE_TYPES.PAWN]: 3
+                                };
+                                score += pieceValue[targetPiece.type] || 0;
+                            }
+                            
+                            // 棋子价值（移动重要棋子）
+                            const pieceValue = {
+                                [PIECE_TYPES.KING]: 0,
+                                [PIECE_TYPES.CHARIOT]: 1,
+                                [PIECE_TYPES.CANNON]: 1,
+                                [PIECE_TYPES.HORSE]: 2,
+                                [PIECE_TYPES.ELEPHANT]: 0,
+                                [PIECE_TYPES.GUARD]: 0,
+                                [PIECE_TYPES.PAWN]: 3
+                            };
+                            score += pieceValue[move.pieceType] || 0;
+                            
+                            // 向前移动得分
+                            if (move.toRow > move.fromRow) score += 2;
+                            
+                            // 中心控制得分
+                            const centerDistance = Math.abs(move.toCol - 4);
+                            score += (5 - centerDistance);
+                            
+                            // 攻击红方棋子得分
+                            const targetRow = move.toRow - 1; // 上方位置
+                            const targetCol = move.toCol;
+                            if (isWithinBoard(targetRow, targetCol)) {
+                                const threatPiece = gameState.board[targetRow][targetCol];
+                                if (threatPiece && threatPiece.color === 'red') {
+                                    score += 1;
+                                }
+                            }
+                            
+                            return {move, score};
+                        });
+                        
+                        // 选择最佳走法
+                        ratedMoves.sort((a, b) => b.score - a.score);
+                        const bestScore = ratedMoves[0].score;
+                        const bestMoves = ratedMoves.filter(m => m.score >= bestScore - 3);
+                        chosenMove = bestMoves[Math.floor(Math.random() * bestMoves.length)].move;
+                    }
+                    
+                    // 立即执行AI走棋
+                    movePiece(chosenMove.fromRow, chosenMove.fromCol, chosenMove.toRow, chosenMove.toCol);
+                    gameState.aiThinking = false;
+                    logDebug(`AI移动: ${chosenMove.pieceType} 从(${chosenMove.fromRow}, ${chosenMove.fromCol})到(${chosenMove.toRow}, ${chosenMove.toCol})`);
+                    
+                } catch (error) {
+                    logDebug(`AI移动出错: ${error}`);
                     gameState.aiThinking = false;
                     updateStatus();
-                    return;
                 }
-                
-                // 随机选择一个走法
-                const chosenMove = moves[Math.floor(Math.random() * moves.length)];
-                
-                // 执行AI走棋
-                movePiece(chosenMove.fromRow, chosenMove.fromCol, chosenMove.toRow, chosenMove.toCol);
-                gameState.aiThinking = false;
-                logDebug(`AI移动: 从(${chosenMove.fromRow}, ${chosenMove.fromCol})到(${chosenMove.toRow}, ${chosenMove.toCol})`);
-            }, thinkTime);
+            }, 50); // 仅50ms延迟，几乎立即响应
         }
         
         // 初始化游戏
