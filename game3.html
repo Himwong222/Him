@@ -462,13 +462,18 @@
         <div class="final-score" id="final-score">0</div>
         <p>最高分: <span id="final-high-score">0</span></p>
         <button class="game-over-btn" id="restart-btn">再来一局</button>
+        <button class="game-over-btn" id="sound-toggle-btn" style="background: #6c5ce7; margin-top: 10px;">🔊 音效</button>
     </div>
     
     <div class="footer">
         BlockBlast - 传统俄罗斯方块游戏 | 使用HTML5 Canvas开发 | 难度可选 | 最高分记录
     </div>
 
+    <script src="js/game-engine.js"></script>
     <script>
+        // 使用通用遊戲引擎
+        const game = new GameEngine('game-canvas', { width: 400, height: 600 });
+        
         // 游戏常量
         const COLS = 10;
         const ROWS = 20;
@@ -554,8 +559,11 @@
             // 创建空游戏板
             gameState.board = Array.from({ length: ROWS }, () => Array(COLS).fill(0));
             
+            // 初始化音效系統
+            game.audio.init();
+            
             // 从本地存储加载最高分
-            gameState.highScore = localStorage.getItem('blockblast-highscore') || 0;
+            gameState.highScore = game.getStorage('blockblast-highscore', 0);
             
             // 重置游戏状态
             gameState.score = 0;
@@ -862,6 +870,16 @@
                 const linePoints = [0, 100, 300, 500, 800];
                 gameState.score += linePoints[linesCleared] * gameState.level;
                 
+                // 播放消除音效
+                if (linesCleared >= 4) {
+                    game.audio.play('victory'); // 四消
+                    // 四消粒子效果
+                    game.createParticles(400, 300, { count: 40, color: '#FFD700' });
+                } else {
+                    game.audio.play('clear');
+                    game.createParticles(400, 300, { count: linesCleared * 5, color: '#6c63ff' });
+                }
+                
                 // 更新消除行数
                 gameState.lines += linesCleared;
                 
@@ -871,6 +889,7 @@
                     gameState.level = newLevel;
                     // 每升一级，下落速度加快10%（最低100ms）
                     gameState.dropSpeed = Math.max(100, gameState.dropSpeed * 0.9);
+                    game.audio.play('score'); // 等級提升音效
                 }
                 
                 // 更新UI
@@ -879,7 +898,7 @@
                 // 检查是否打破最高分记录
                 if (gameState.score > gameState.highScore) {
                     gameState.highScore = gameState.score;
-                    localStorage.setItem('blockblast-highscore', gameState.highScore);
+                    game.setStorage('blockblast-highscore', gameState.highScore);
                     updateUI();
                 }
             }
@@ -973,6 +992,12 @@
         // 游戏结束
         function gameOver() {
             gameState.gameOver = true;
+            
+            // 播放游戏结束音效
+            game.audio.play('gameover');
+            
+            // 创建粒子效果
+            game.createParticles(400, 300, { count: 30, color: '#ff6b6b' });
             
             // 更新最终分数显示
             document.getElementById('final-score').textContent = gameState.score;
@@ -1099,6 +1124,13 @@
                         gameState.dropCounter = 0;
                     }
                 });
+            });
+            
+            // 音效开关按钮
+            document.getElementById('sound-toggle-btn').addEventListener('click', () => {
+                const isMuted = game.audio.toggleMute();
+                document.getElementById('sound-toggle-btn').textContent = isMuted ? '🔇 音效' : '🔊 音效';
+                if (!isMuted) game.audio.init();
             });
         }
 

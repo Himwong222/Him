@@ -102,6 +102,32 @@
             margin: 0 auto;
         }
         
+        .sound-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .sound-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .sound-toggle.muted {
+            opacity: 0.6;
+        }
+        
         .controls {
             margin-top: 20px;
             display: flex;
@@ -237,6 +263,7 @@
         </div>
         
         <canvas id="gameCanvas" width="800" height="300"></canvas>
+        <button id="soundToggle" class="sound-toggle" title="音效開關">🔊</button>
         
         <div class="controls">
             <button id="startBtn">開始遊戲</button>
@@ -262,7 +289,19 @@
         </div>
     </div>
 
+    <script src="js/game-engine.js"></script>
     <script>
+        // 使用通用遊戲引擎
+        const game = new GameEngine('gameCanvas', { width: 800, height: 300 });
+        // 安全跨遊戲分數更新封裝
+        function safeScoreIncrement(delta) {
+            score += delta;
+            scoreDisplay.textContent = score;
+            if (typeof Achievements !== 'undefined' && typeof Achievements.setScoreTotal === 'function') Achievements.setScoreTotal(score);
+        }
+        // Ensure Achievements shim to avoid runtime errors if achievements module not loaded yet
+        window.Achievements = window.Achievements || { init(){}, incrementGames(){}, setScoreTotal(){}, addScoreDelta(){}, getList(){ return {}; } };
+        
         // 遊戲變量
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -279,6 +318,7 @@
         const resetBtn = document.getElementById('resetBtn');
         const restartBtn = document.getElementById('restartBtn');
         const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        const soundToggle = document.getElementById('soundToggle');
         
         // 遊戲設置
         let dino = {
@@ -300,6 +340,12 @@
         };
         
         let score = 0;
+        // safe score increment for cross-game achievements
+        function safeScoreIncrement(delta){
+            score += delta;
+            scoreDisplay.textContent = score;
+            if (typeof Achievements !== 'undefined' && typeof Achievements.setScoreTotal === 'function') Achievements.setScoreTotal(score);
+        }
         let highScore = 0;
         let gameSpeed = 6;
         let gameRunning = false;
@@ -313,7 +359,7 @@
                 baseSpeed: 5,
                 speedIncreaseInterval: 600,
                 obstacleFrequency: 120,
-                obstacleTypes: ['cactus', 'cactus', 'cactus', 'cactus'], // 減少小鳥出現機率
+                obstacleTypes: ['cactus', 'cactus', 'cactus', 'cactus'],
                 gravity: 0.7,
                 jumpPower: 16
             },
@@ -321,7 +367,7 @@
                 baseSpeed: 6,
                 speedIncreaseInterval: 500,
                 obstacleFrequency: 100,
-                obstacleTypes: ['cactus', 'cactus', 'cactus', 'bird'], // 原始設置
+                obstacleTypes: ['cactus', 'cactus', 'cactus', 'bird'],
                 gravity: 0.8,
                 jumpPower: 15
             },
@@ -329,7 +375,7 @@
                 baseSpeed: 7,
                 speedIncreaseInterval: 400,
                 obstacleFrequency: 80,
-                obstacleTypes: ['cactus', 'cactus', 'bird', 'bird'], // 增加小鳥出現機率
+                obstacleTypes: ['cactus', 'cactus', 'bird', 'bird'],
                 gravity: 0.9,
                 jumpPower: 14
             }
@@ -364,18 +410,18 @@
             ]
         };
         
+        // 初始化音效
+        game.audio.init();
+        
         // 從localStorage載入最高分
         function loadHighScore() {
-            const savedHighScore = localStorage.getItem('dinoHighScore');
-            if (savedHighScore) {
-                highScore = parseInt(savedHighScore);
-                highScoreDisplay.textContent = highScore;
-            }
+            highScore = game.loadHighScore('dinoHighScore');
+            highScoreDisplay.textContent = highScore;
         }
         
         // 儲存最高分到localStorage
         function saveHighScore() {
-            localStorage.setItem('dinoHighScore', highScore);
+            game.saveHighScore('dinoHighScore', score);
         }
         
         // 初始化遊戲
@@ -398,6 +444,8 @@
             frames = 0;
             
             scoreDisplay.textContent = score;
+                    if (typeof Achievements !== 'undefined' && typeof Achievements.setScoreTotal === 'function') Achievements.setScoreTotal(score);
+                    if (typeof Achievements !== 'undefined' && typeof Achievements.setScoreTotal === 'function') Achievements.setScoreTotal(score);
             highScoreDisplay.textContent = highScore;
             speedDisplay.textContent = gameSpeed;
             gameOverScreen.style.display = 'none';
@@ -439,6 +487,7 @@
             if (!dino.jumping) {
                 dino.jumping = true;
                 dino.jumpVelocity = -dino.jumpPower;
+                game.audio.play('jump');
             }
         }
         
@@ -452,7 +501,6 @@
                 
                 let obstacle;
                 if (type === 'cactus') {
-                    // 仙人掌
                     obstacle = {
                         x: canvas.width,
                         y: canvas.height - 60,
@@ -461,10 +509,9 @@
                         type: 'cactus'
                     };
                 } else {
-                    // 小鳥
                     obstacle = {
                         x: canvas.width,
-                        y: canvas.height - 120 - Math.random() * 60, // 在不同高度
+                        y: canvas.height - 120 - Math.random() * 60,
                         width: 40,
                         height: 30,
                         type: 'bird',
@@ -514,7 +561,6 @@
         function drawObstacles() {
             obstacles.forEach(obstacle => {
                 if (obstacle.type === 'cactus') {
-                    // 仙人掌
                     ctx.fillStyle = '#2E7D32';
                     ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
                     
@@ -524,7 +570,6 @@
                     ctx.fillRect(obstacle.x + obstacle.width - 3, obstacle.y + 20, 6, 5);
                     ctx.fillRect(obstacle.x + obstacle.width/2 - 2, obstacle.y + 30, 4, 5);
                 } else if (obstacle.type === 'bird') {
-                    // 小鳥
                     ctx.fillStyle = '#FF9800';
                     
                     // 身體
@@ -532,7 +577,7 @@
                     ctx.arc(obstacle.x + 20, obstacle.y + 15, 15, 0, Math.PI * 2);
                     ctx.fill();
                     
-                    // 翅膀（簡單動畫）
+                    // 翅膀
                     const wingOffset = Math.sin(obstacle.animation) * 5;
                     ctx.fillRect(obstacle.x + 10, obstacle.y + 10 + wingOffset, 20, 8);
                     
@@ -561,7 +606,6 @@
         
         // 繪製地面
         function drawGround() {
-            // 地面
             ctx.fillStyle = '#8BC34A';
             ctx.fillRect(0, ground.y, canvas.width, ground.height);
             
@@ -578,7 +622,7 @@
         
         // 繪製遊戲
         function draw() {
-            // 清空畫布（白色背景）
+            // 清空畫布
             ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
@@ -593,6 +637,9 @@
             
             // 繪製恐龍
             drawDino();
+            
+            // 繪製粒子效果
+            game.drawParticles();
             
             // 繪製分數和難度
             ctx.fillStyle = '#333';
@@ -651,8 +698,15 @@
                 // 移除超出畫面的障礙物
                 if (obstacle.x + obstacle.width < 0) {
                     obstacles.splice(index, 1);
-                    score += 10;
-                    scoreDisplay.textContent = score;
+                    safeScoreIncrement(10);
+                    // 播放得分音效
+                    game.audio.play('score');
+                    
+                    // 添加得分粒子效果
+                    game.createParticles(obstacle.x + obstacle.width/2, obstacle.y, {
+                        count: 5,
+                        color: '#FFD700'
+                    });
                     
                     // 更新最高分顯示
                     if (score > highScore) {
@@ -694,13 +748,17 @@
         
         // 開始遊戲
         function startGame() {
+            if (window.Achievements && typeof window.Achievements.incrementGames === 'function') {
+                try { window.Achievements.incrementGames(); } catch (e) { /* ignore */ }
+            }
             if (gameRunning) return;
             
             initGame();
             gameRunning = true;
-            gameLoop = setInterval(gameTick, 1000/60); // 60 FPS
+            gameLoop = setInterval(gameTick, 1000/60);
             startBtn.textContent = "遊戲進行中";
             startBtn.disabled = true;
+            game.audio.play('click');
         }
         
         // 重置遊戲
@@ -712,6 +770,7 @@
             gameRunning = false;
             startBtn.textContent = "開始遊戲";
             startBtn.disabled = false;
+            game.clearParticles();
             initGame();
             draw();
         }
@@ -757,6 +816,15 @@
             finalScoreDisplay.textContent = score;
             finalHighScoreDisplay.textContent = highScore;
             
+            // 播放遊戲結束音效
+            game.audio.play('gameover');
+            
+            // 創建粒子效果
+            game.createParticles(dino.x + dino.width/2, dino.y + dino.height/2, {
+                count: 30,
+                color: ['#FF6B6B', '#D32F2F', '#B71C1C']
+            });
+            
             // 顯示回饋訊息
             const feedback = getGameFeedback();
             gameFeedback.textContent = feedback;
@@ -770,6 +838,14 @@
             
             gameOverScreen.style.display = 'block';
         }
+        
+        // 音效開關
+        soundToggle.addEventListener('click', () => {
+            const isMuted = game.audio.toggleMute();
+            soundToggle.textContent = isMuted ? '🔇' : '🔊';
+            soundToggle.classList.toggle('muted', isMuted);
+            if (!isMuted) game.audio.init();
+        });
         
         // 鍵盤控制
         document.addEventListener('keydown', (e) => {
@@ -798,6 +874,7 @@
         difficultyButtons.forEach(button => {
             button.addEventListener('click', () => {
                 setDifficulty(button.dataset.difficulty);
+                game.audio.play('click');
             });
         });
         

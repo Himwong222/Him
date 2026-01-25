@@ -1,0 +1,21 @@
+{
+    "name": "Him Wong 遊戲館",
+    "short_name": "遊戲館",
+    "description": "一個包含11款HTML5小遊戲的集合，包括動作、棋類、益智和體感遊戲",
+    "start_url": "index.html",
+    "display": "standalone",
+    "background_color": "#1a1a2e",
+    "theme_color": "#6c63ff",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%236c63ff' width='512' height='512' rx='64'/><text x='50%25' y='55%25' text-anchor='middle' font-size='300' fill='white'>🎮</text></svg>",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ],
+    "categories": ["games", "entertainment"],
+    "lang": "zh-HK",
+    "dir": "ltr"
+}
