@@ -410,9 +410,286 @@
                 flex-direction: column;
             }
         }
+
+        /* 开始画面样式 */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .start-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .start-content {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 90%;
+            animation: pulse 2s infinite;
+        }
+
+        .game-title {
+            font-size: 4rem;
+            color: #6c63ff;
+            margin-bottom: 10px;
+            text-shadow: 0 5px 15px rgba(108, 99, 255, 0.5);
+        }
+
+        .game-subtitle {
+            font-size: 1.8rem;
+            color: #ffd166;
+            margin-bottom: 30px;
+        }
+
+        .start-instructions {
+            margin: 30px 0;
+            font-size: 1.3rem;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+        .start-instructions p {
+            margin: 10px 0;
+        }
+
+        .start-button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        .start-button:hover {
+            background-color: #5a52d5;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .start-button:active {
+            transform: translateY(2px);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            .game-title {
+                font-size: 3rem;
+            }
+            
+            .game-subtitle {
+                font-size: 1.5rem;
+            }
+            
+            .start-content {
+                padding: 30px 20px;
+            }
+        }
+        
+        /* 游戏结束画面样式 */
+        .game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        
+        .game-over-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .game-over-content {
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+            max-width: 600px;
+            width: 90%;
+            border: 3px solid #6c63ff;
+        }
+        
+        .game-over-title {
+            font-size: 4rem;
+            color: #ff6b6b;
+            margin-bottom: 30px;
+            text-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
+        }
+        
+        .game-over-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            border-left: 5px solid #6c63ff;
+        }
+        
+        .stat-label {
+            font-size: 1.5rem;
+            color: #aaa;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            color: #ffd166;
+            font-weight: bold;
+        }
+        
+        .game-over-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .play-again-button {
+            background-color: #6c63ff;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .play-again-button:hover {
+            background-color: #5a52d5;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .back-to-menu-button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .back-to-menu-button:hover {
+            background-color: #ff5252;
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        @media (max-width: 600px) {
+            .game-over-title {
+                font-size: 3rem;
+            }
+            
+            .stat-label {
+                font-size: 1.2rem;
+            }
+            
+            .stat-value {
+                font-size: 2rem;
+            }
+            
+            .game-over-buttons {
+                flex-direction: column;
+            }
+            
+            .play-again-button,
+            .back-to-menu-button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 开始画面 -->
+    <div id="start-screen" class="start-screen">
+        <div class="start-content">
+            <h1 class="game-title">⭕❌ 井字過三關</h1>
+            <p class="game-subtitle">經典井字遊戲，三局兩勝制</p>
+            <div class="start-instructions">
+                <p>按任意鍵開始遊戲</p>
+                <p>或點擊下方按鈕開始</p>
+            </div>
+            <button id="start-game-button" class="start-button">開始遊戲</button>
+        </div>
+    </div>
+    
+    <!-- 游戏结束画面 -->
+    <div id="game-over-screen" class="game-over-screen hidden">
+        <div class="game-over-content">
+            <h1 class="game-over-title">Game Over</h1>
+            <div class="game-over-stats">
+                <div class="stat-item">
+                    <span class="stat-label">最終分數</span>
+                    <span class="stat-value" id="final-score">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">比賽結果</span>
+                    <span class="stat-value" id="match-result">無</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">累計勝場</span>
+                    <span class="stat-value" id="total-wins">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">累計敗場</span>
+                    <span class="stat-value" id="total-losses">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">累計平局</span>
+                    <span class="stat-value" id="total-draws">0</span>
+                </div>
+            </div>
+            <div class="game-over-buttons">
+                <button id="play-again-button" class="play-again-button">再玩一次</button>
+                <button id="back-to-menu-button" class="back-to-menu-button">返回主選單</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>⭕❌ 井字遊戲</h1>
@@ -536,6 +813,8 @@
         let round = 0;
         let matchWinner = null;
         let history = [];
+        let showStartScreen = true; // 是否顯示開始畫面
+        let totalStats = { wins: 0, losses: 0, draws: 0 }; // 勝場累計系統
         
         // DOM 元素
         const gameBoardElement = document.getElementById('game-board');
@@ -550,6 +829,16 @@
         const matchWinnerElement = document.getElementById('match-winner');
         const historyListElement = document.getElementById('history-list');
         const difficultySection = document.getElementById('difficulty-section');
+        const startScreenElement = document.getElementById('start-screen');
+        const startGameButton = document.getElementById('start-game-button');
+        const gameOverScreenElement = document.getElementById('game-over-screen');
+        const finalScoreElement = document.getElementById('final-score');
+        const matchResultElement = document.getElementById('match-result');
+        const totalWinsElement = document.getElementById('total-wins');
+        const totalLossesElement = document.getElementById('total-losses');
+        const totalDrawsElement = document.getElementById('total-draws');
+        const playAgainButton = document.getElementById('play-again-button');
+        const backToMenuButton = document.getElementById('back-to-menu-button');
         
         // 遊戲模式按鈕
         const twoPlayerBtn = document.getElementById('two-player-btn');
@@ -570,9 +859,118 @@
                 gameBoardElement.appendChild(cell);
             }
             
+            // 加載勝場累計統計
+            loadStats();
+            
             // 重置遊戲狀態
             resetBoard();
             updateUI();
+            
+            // 顯示開始畫面
+            if (showStartScreen) {
+                startScreenElement.classList.remove('hidden');
+                gameActive = false; // 遊戲未開始
+            } else {
+                startScreenElement.classList.add('hidden');
+                gameActive = true; // 遊戲已開始
+            }
+        }
+        
+        // 開始遊戲
+        function startGame() {
+            showStartScreen = false;
+            startScreenElement.classList.add('hidden');
+            gameActive = true;
+            resetBoard();
+            updateUI();
+        }
+        
+        // 顯示遊戲結束畫面
+        function showGameOverScreen() {
+            // 計算最終分數（玩家1的得分）
+            const finalScore = scores.X;
+            
+            // 確定比賽結果並更新勝場累計統計
+            let resultText = '無';
+            let resultType = '';
+            
+            if (matchWinner === 'X') {
+                resultText = gameMode === 'ai' ? '玩家 獲勝' : '玩家1 獲勝';
+                resultType = 'win';
+            } else if (matchWinner === 'O') {
+                resultText = gameMode === 'ai' ? 'AI 獲勝' : '玩家2 獲勝';
+                resultType = 'loss';
+            } else if (round > 0 && scores.X === scores.O) {
+                resultText = '平局';
+                resultType = 'draw';
+            }
+            
+            // 更新勝場累計統計
+            if (resultType) {
+                updateStats(resultType);
+            }
+            
+            // 加載最新的統計數據
+            loadStats();
+            
+            // 更新遊戲結束畫面內容
+            finalScoreElement.textContent = finalScore;
+            matchResultElement.textContent = resultText;
+            totalWinsElement.textContent = totalStats.wins;
+            totalLossesElement.textContent = totalStats.losses;
+            totalDrawsElement.textContent = totalStats.draws;
+            
+            // 顯示遊戲結束畫面
+            gameOverScreenElement.classList.remove('hidden');
+            gameActive = false;
+        }
+        
+        // 再玩一次
+        function playAgain() {
+            gameOverScreenElement.classList.add('hidden');
+            startNewGame();
+        }
+        
+        // 返回主選單
+        function backToMenu() {
+            gameOverScreenElement.classList.add('hidden');
+            showStartScreen = true;
+            startScreenElement.classList.remove('hidden');
+            gameActive = false;
+        }
+        
+        // 加載勝場累計統計
+        function loadStats() {
+            try {
+                const savedStats = localStorage.getItem('ticTacToeStats');
+                if (savedStats) {
+                    totalStats = JSON.parse(savedStats);
+                }
+            } catch (error) {
+                console.error('加載統計數據時出錯:', error);
+                totalStats = { wins: 0, losses: 0, draws: 0 };
+            }
+        }
+        
+        // 保存勝場累計統計
+        function saveStats() {
+            try {
+                localStorage.setItem('ticTacToeStats', JSON.stringify(totalStats));
+            } catch (error) {
+                console.error('保存統計數據時出錯:', error);
+            }
+        }
+        
+        // 更新勝場累計統計
+        function updateStats(result) {
+            if (result === 'win') {
+                totalStats.wins++;
+            } else if (result === 'loss') {
+                totalStats.losses++;
+            } else if (result === 'draw') {
+                totalStats.draws++;
+            }
+            saveStats();
         }
         
         // 重置棋盤
@@ -707,11 +1105,16 @@
                 // 檢查是否有人贏得比賽（三局兩勝）
                 if (scores.X >= 2 || scores.O >= 2) {
                     matchWinner = scores.X >= 2 ? 'X' : 'O';
-                    const matchWinnerName = matchWinner === 'X' 
-                        ? (gameMode === 'ai' ? '玩家' : '玩家1') 
+                    const matchWinnerName = matchWinner === 'X'
+                        ? (gameMode === 'ai' ? '玩家' : '玩家1')
                         : (gameMode === 'ai' ? 'AI' : '玩家2');
                     currentTurnElement.textContent = `比賽結束！${matchWinnerName} 贏得比賽！`;
                     gameActive = false;
+                    
+                    // 顯示遊戲結束畫面
+                    setTimeout(() => {
+                        showGameOverScreen();
+                    }, 1500);
                 } else {
                     currentTurnElement.textContent = `${winnerName} 贏得此局！`;
                     setTimeout(() => {
@@ -876,9 +1279,26 @@
             history = [];
             resetBoard();
             updateUI();
+            // 不顯示開始畫面，因為遊戲已經開始
+            showStartScreen = false;
+            startScreenElement.classList.add('hidden');
         }
         
         // 事件監聽器
+        // 鍵盤事件：按任意鍵開始遊戲
+        document.addEventListener('keydown', (event) => {
+            if (showStartScreen) {
+                startGame();
+            }
+        });
+        
+        // 開始按鈕事件
+        startGameButton.addEventListener('click', startGame);
+        
+        // 遊戲結束畫面按鈕事件
+        playAgainButton.addEventListener('click', playAgain);
+        backToMenuButton.addEventListener('click', backToMenu);
+        
         twoPlayerBtn.addEventListener('click', () => {
             gameMode = 'two-player';
             twoPlayerBtn.classList.add('active');

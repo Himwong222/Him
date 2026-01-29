@@ -295,9 +295,298 @@
             cursor: pointer;
             font-size: 0.8rem;
         }
+        
+        /* 开始画面样式 */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: white;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+        }
+        
+        .start-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.9), rgba(101, 67, 33, 0.9));
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 5px solid #FFD700;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7); }
+            100% { transform: scale(1); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); }
+        }
+        
+        .start-title {
+            font-size: 5rem;
+            color: #FFD700;
+            text-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+            margin-bottom: 20px;
+            letter-spacing: 10px;
+        }
+        
+        .start-subtitle {
+            font-size: 1.8rem;
+            color: #FFF;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .start-instruction {
+            font-size: 2.5rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .start-hint {
+            font-size: 1.5rem;
+            color: #CCC;
+            margin-bottom: 30px;
+        }
+        
+        .start-btn {
+            padding: 20px 50px;
+            font-size: 1.8rem;
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .start-btn:hover {
+            background-color: #3CB371;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .start-btn:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .start-title {
+                font-size: 3rem;
+                letter-spacing: 5px;
+            }
+            
+            .start-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .start-instruction {
+                font-size: 1.8rem;
+            }
+            
+            .start-hint {
+                font-size: 1.2rem;
+            }
+            
+            .start-btn {
+                padding: 15px 30px;
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* 游戏结束画面样式 */
+        .game-over-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            color: white;
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+        }
+        
+        .game-over-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(139, 69, 19, 0.95), rgba(101, 67, 33, 0.95));
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+            border: 5px solid #FF6B6B;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .game-over-title {
+            font-size: 4.5rem;
+            color: #FF6B6B;
+            text-shadow: 0 0 25px #FF6B6B, 0 0 50px #FF0000;
+            margin-bottom: 20px;
+            letter-spacing: 8px;
+        }
+        
+        .game-over-result {
+            font-size: 3rem;
+            color: #FFD700;
+            margin-bottom: 30px;
+            text-shadow: 0 0 15px #FFD700;
+        }
+        
+        .game-over-score {
+            font-size: 2.5rem;
+            color: #FFF;
+            margin-bottom: 40px;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 15px 30px;
+            border-radius: 15px;
+            display: inline-block;
+            border: 2px solid #2E8B57;
+        }
+        
+        .game-over-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+            font-size: 1.8rem;
+        }
+        
+        .stat-item {
+            background-color: rgba(0, 0, 0, 0.4);
+            padding: 15px 25px;
+            border-radius: 12px;
+            border: 2px solid #4A90E2;
+            min-width: 150px;
+        }
+        
+        .stat-item span {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 2.2rem;
+        }
+        
+        .play-again-btn {
+            padding: 20px 60px;
+            font-size: 2rem;
+            background-color: #2E8B57;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+        }
+        
+        .play-again-btn:hover {
+            background-color: #3CB371;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .play-again-btn:active {
+            transform: translateY(0);
+        }
+        
+        .game-over-hint {
+            font-size: 1.5rem;
+            color: #CCC;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .game-over-title {
+                font-size: 3rem;
+                letter-spacing: 5px;
+            }
+            
+            .game-over-result {
+                font-size: 2rem;
+            }
+            
+            .game-over-score {
+                font-size: 1.8rem;
+            }
+            
+            .game-over-stats {
+                flex-direction: column;
+                gap: 20px;
+                font-size: 1.5rem;
+            }
+            
+            .stat-item {
+                min-width: auto;
+                padding: 12px 20px;
+            }
+            
+            .stat-item span {
+                font-size: 1.8rem;
+            }
+            
+            .play-again-btn {
+                padding: 15px 40px;
+                font-size: 1.8rem;
+            }
+            
+            .game-over-hint {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 开始画面 -->
+    <div id="start-screen" class="start-screen">
+        <div class="start-content">
+            <h1 class="start-title">中國象棋</h1>
+            <div class="start-subtitle">传统版 - 已修复棋子移动问题</div>
+            <div class="start-instruction">按任意键开始游戏</div>
+            <div class="start-hint">或点击下方按钮开始</div>
+            <button id="start-screen-btn" class="start-btn">开始游戏</button>
+        </div>
+    </div>
+
+    <!-- 游戏结束画面 -->
+    <div id="game-over-screen" class="game-over-screen">
+        <div class="game-over-content">
+            <h1 class="game-over-title">Game Over</h1>
+            <div class="game-over-result" id="game-over-result">红方获胜！</div>
+            <div class="game-over-score" id="game-over-score">分数: 0</div>
+            <div class="game-over-stats">
+                <div class="stat-item">胜场: <span id="wins-count">0</span></div>
+                <div class="stat-item">负场: <span id="losses-count">0</span></div>
+                <div class="stat-item">和棋: <span id="draws-count">0</span></div>
+            </div>
+            <button id="play-again-btn" class="play-again-btn">再玩一次</button>
+            <div class="game-over-hint">或按任意键重新开始</div>
+        </div>
+    </div>
+
     <div class="header">
         <h1>中國象棋</h1>
         <div class="subtitle">传统版 - 已修复棋子移动问题</div>
@@ -373,7 +662,15 @@
             selectedPiece: null,
             moveHistory: [],
             aiThinking: false,
-            originalBoard: null // 保存初始棋盘状态
+            originalBoard: null, // 保存初始棋盘状态
+            showStartScreen: true, // 是否显示开始画面
+            // 胜场累计系统
+            stats: {
+                wins: 0,    // 红方胜利次数
+                losses: 0,  // 黑方胜利次数（红方失败）
+                draws: 0    // 和棋次数
+            },
+            currentScore: 0 // 当前游戏分数
         };
 
         // 棋盘和棋子常量
@@ -822,6 +1119,11 @@
                 if (winner) {
                     statusElement.textContent = winner === 'red' ? '游戏结束！红方获胜！' : '游戏结束！黑方获胜！';
                     gameState.gameStarted = false;
+                    
+                    // 显示游戏结束画面
+                    setTimeout(() => {
+                        showGameOverScreen(winner);
+                    }, 500); // 延迟500ms显示，让用户看到状态栏变化
                 }
             }
         }
@@ -847,6 +1149,99 @@
             if (!redKingFound) return 'black';
             if (!blackKingFound) return 'red';
             return null;
+        }
+        
+        // 显示游戏结束画面
+        function showGameOverScreen(winner) {
+            // 更新统计
+            if (winner === 'red') {
+                gameState.stats.wins++;
+                gameState.currentScore += 100; // 胜利加100分
+            } else if (winner === 'black') {
+                gameState.stats.losses++;
+                gameState.currentScore += 50; // 失败加50分
+            } else {
+                gameState.stats.draws++;
+                gameState.currentScore += 75; // 和棋加75分
+            }
+            
+            // 保存统计到localStorage
+            saveStats();
+            
+            // 更新游戏结束画面内容
+            const resultElement = document.getElementById('game-over-result');
+            const scoreElement = document.getElementById('game-over-score');
+            const winsElement = document.getElementById('wins-count');
+            const lossesElement = document.getElementById('losses-count');
+            const drawsElement = document.getElementById('draws-count');
+            
+            if (winner === 'red') {
+                resultElement.textContent = '红方获胜！';
+                resultElement.style.color = '#FF6B6B';
+            } else if (winner === 'black') {
+                resultElement.textContent = '黑方获胜！';
+                resultElement.style.color = '#4A90E2';
+            } else {
+                resultElement.textContent = '和棋！';
+                resultElement.style.color = '#FFD700';
+            }
+            
+            scoreElement.textContent = `分数: ${gameState.currentScore}`;
+            winsElement.textContent = gameState.stats.wins;
+            lossesElement.textContent = gameState.stats.losses;
+            drawsElement.textContent = gameState.stats.draws;
+            
+            // 显示游戏结束画面
+            const gameOverScreen = document.getElementById('game-over-screen');
+            gameOverScreen.style.display = 'flex';
+            
+            // 添加键盘事件监听器（按任意键重新开始）
+            const keyHandler = (e) => {
+                if (e.key !== 'Escape') { // 排除Esc键
+                    playAgain();
+                    document.removeEventListener('keydown', keyHandler);
+                }
+            };
+            document.addEventListener('keydown', keyHandler);
+            
+            logDebug(`游戏结束！${winner === 'red' ? '红方' : winner === 'black' ? '黑方' : '和棋'}获胜`);
+        }
+        
+        // 再玩一次
+        function playAgain() {
+            // 隐藏游戏结束画面
+            const gameOverScreen = document.getElementById('game-over-screen');
+            gameOverScreen.style.display = 'none';
+            
+            // 重置游戏
+            resetGame();
+        }
+        
+        // 保存统计到localStorage
+        function saveStats() {
+            try {
+                localStorage.setItem('chessStats', JSON.stringify(gameState.stats));
+                localStorage.setItem('chessScore', gameState.currentScore.toString());
+            } catch (e) {
+                logDebug('保存统计失败: ' + e);
+            }
+        }
+        
+        // 加载统计从localStorage
+        function loadStats() {
+            try {
+                const stats = localStorage.getItem('chessStats');
+                const score = localStorage.getItem('chessScore');
+                
+                if (stats) {
+                    gameState.stats = JSON.parse(stats);
+                }
+                if (score) {
+                    gameState.currentScore = parseInt(score) || 0;
+                }
+            } catch (e) {
+                logDebug('加载统计失败: ' + e);
+            }
         }
         
         // 移动棋子
@@ -884,6 +1279,21 @@
         // 事件处理
         function setupEventListeners() {
             const canvas = document.getElementById('chessboard');
+            
+            // 键盘事件 - 按任意键开始游戏
+            document.addEventListener('keydown', (e) => {
+                if (gameState.showStartScreen && !gameState.gameStarted) {
+                    // 按任意键开始游戏
+                    startGame();
+                }
+            });
+            
+            // 开始画面按钮事件
+            document.getElementById('start-screen-btn').addEventListener('click', () => {
+                if (gameState.showStartScreen && !gameState.gameStarted) {
+                    startGame();
+                }
+            });
             
             // 棋盘点击事件
             canvas.addEventListener('click', (e) => {
@@ -1065,6 +1475,15 @@
                 return;
             }
             
+            // 隐藏开始画面
+            if (gameState.showStartScreen) {
+                const startScreen = document.getElementById('start-screen');
+                if (startScreen) {
+                    startScreen.style.display = 'none';
+                }
+                gameState.showStartScreen = false;
+            }
+            
             gameState.gameStarted = true;
             updateStatus();
             logDebug('游戏开始！');
@@ -1081,6 +1500,14 @@
             initBoard();
             drawBoard();
             gameState.gameStarted = false;
+            gameState.showStartScreen = true;
+            
+            // 显示开始画面
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) {
+                startScreen.style.display = 'flex';
+            }
+            
             updateStatus();
             logDebug('游戏重置！');
         }
@@ -1264,6 +1691,9 @@
         
         // 初始化游戏
         function initGame() {
+            // 加载统计信息
+            loadStats();
+            
             initBoard();
             drawBoard();
             setupEventListeners();
@@ -1271,6 +1701,9 @@
             // 默认选择双人对决模式
             setGameMode('two-player');
             setDifficulty('medium');
+            
+            // 为「再玩一次」按钮添加事件监听器
+            document.getElementById('play-again-btn').addEventListener('click', playAgain);
             
             logDebug('游戏初始化完成！');
         }

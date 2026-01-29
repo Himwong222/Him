@@ -66,6 +66,28 @@
             font-weight: bold;
         }
         
+        /* 最高分样式 - 绿色 */
+        .best-score-box {
+            background-color: #2E8B57; /* 绿色 */
+            border: 2px solid #228B22;
+        }
+        
+        .best-score-box .score-value {
+            color: #FFD700; /* 金色 */
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* 最低分样式 - 红色 */
+        .worst-score-box {
+            background-color: #CD5C5C; /* 红色 */
+            border: 2px solid #B22222;
+        }
+        
+        .worst-score-box .score-value {
+            color: #FFF;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        
         .game-intro {
             display: flex;
             justify-content: space-between;
@@ -231,9 +253,133 @@
                 font-size: 1.1rem;
             }
         }
+        
+        /* 开始画面样式 */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(250, 248, 239, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            color: #776e65;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .start-content {
+            text-align: center;
+            max-width: 600px;
+            padding: 50px;
+            background-color: #faf8ef;
+            border-radius: 10px;
+            box-shadow: 0 20px 40px rgba(119, 110, 101, 0.3);
+            border: 5px solid #bbada0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 20px 40px rgba(119, 110, 101, 0.3); }
+            50% { transform: scale(1.02); box-shadow: 0 25px 50px rgba(119, 110, 101, 0.4); }
+            100% { transform: scale(1); box-shadow: 0 20px 40px rgba(119, 110, 101, 0.3); }
+        }
+        
+        .start-title {
+            font-size: 6rem;
+            color: #776e65;
+            text-shadow: 3px 3px 0 #bbada0;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .start-subtitle {
+            font-size: 2rem;
+            color: #8f7a66;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .start-instruction {
+            font-size: 2.5rem;
+            color: #f67c5f;
+            margin-bottom: 20px;
+            animation: blink 1.5s infinite;
+            font-weight: bold;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .start-hint {
+            font-size: 1.5rem;
+            color: #8f7a66;
+            margin-bottom: 30px;
+        }
+        
+        .start-btn {
+            padding: 20px 50px;
+            font-size: 1.8rem;
+            background-color: #8f7a66;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(143, 122, 102, 0.3);
+        }
+        
+        .start-btn:hover {
+            background-color: #7c6b5a;
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(143, 122, 102, 0.4);
+        }
+        
+        .start-btn:active {
+            transform: translateY(0);
+        }
+        
+        @media (max-width: 768px) {
+            .start-title {
+                font-size: 4rem;
+            }
+            
+            .start-subtitle {
+                font-size: 1.5rem;
+            }
+            
+            .start-instruction {
+                font-size: 1.8rem;
+            }
+            
+            .start-hint {
+                font-size: 1.2rem;
+            }
+            
+            .start-btn {
+                padding: 15px 30px;
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 开始画面 -->
+    <div id="start-screen" class="start-screen">
+        <div class="start-content">
+            <h1 class="start-title">2048</h1>
+            <div class="start-subtitle">經典數字合併遊戲</div>
+            <div class="start-instruction">按任意鍵開始遊戲</div>
+            <div class="start-hint">或點擊下方按鈕開始</div>
+            <button id="start-screen-btn" class="start-btn">開始遊戲</button>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>2048</h1>
@@ -242,9 +388,13 @@
                     <div class="score-label">分數</div>
                     <div class="score-value" id="score">0</div>
                 </div>
-                <div class="score-box">
+                <div class="score-box best-score-box">
                     <div class="score-label">最高分</div>
                     <div class="score-value" id="best-score">0</div>
+                </div>
+                <div class="score-box worst-score-box">
+                    <div class="score-label">最低分</div>
+                    <div class="score-value" id="worst-score">0</div>
                 </div>
             </div>
         </header>
@@ -284,21 +434,41 @@
         let grid = [];
         let score = 0;
         let bestScore = localStorage.getItem('2048-bestScore') || 0;
+        let worstScore = localStorage.getItem('2048-worstScore') || 0; // 最低分
         let gameOver = false;
         let won = false;
+        let showStartScreen = true; // 是否顯示開始畫面
         const gridSize = 4;
         
         // DOM 元素
         const scoreElement = document.getElementById('score');
         const bestScoreElement = document.getElementById('best-score');
+        const worstScoreElement = document.getElementById('worst-score');
         const tileContainer = document.getElementById('tile-container');
         const gameMessage = document.getElementById('game-message');
         const messageText = document.getElementById('message-text');
         const restartButton = document.getElementById('restart-button');
         const keepPlayingButton = document.getElementById('keep-playing-button');
         
-        // 初始化遊戲
-        function initGame() {
+        // 開始遊戲（隱藏開始畫面）
+        function startGame() {
+            if (showStartScreen) {
+                const startScreen = document.getElementById('start-screen');
+                if (startScreen) {
+                    startScreen.style.display = 'none';
+                }
+                showStartScreen = false;
+                
+                // 顯示遊戲容器
+                document.querySelector('.container').style.opacity = '1';
+            }
+            
+            // 初始化遊戲
+            initGameInternal();
+        }
+        
+        // 內部初始化遊戲（不處理開始畫面）
+        function initGameInternal() {
             // 初始化網格
             grid = Array(gridSize).fill().map(() => Array(gridSize).fill(0));
             
@@ -306,6 +476,7 @@
             score = 0;
             scoreElement.textContent = score;
             bestScoreElement.textContent = bestScore;
+            worstScoreElement.textContent = worstScore;
             
             // 重置遊戲狀態
             gameOver = false;
@@ -323,6 +494,33 @@
             
             // 渲染網格
             updateGrid();
+        }
+        
+        // 初始化遊戲（頁面加載時調用）
+        function initGame() {
+            // 顯示開始畫面，不立即初始化遊戲
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) {
+                startScreen.style.display = 'flex';
+            }
+            showStartScreen = true;
+            
+            // 隱藏遊戲容器
+            document.querySelector('.container').style.opacity = '0.3';
+            
+            // 設置開始按鈕事件監聽器
+            document.getElementById('start-screen-btn').addEventListener('click', startGame);
+            
+            // 設置鍵盤事件監聽器（按任意鍵開始）
+            document.addEventListener('keydown', function(event) {
+                if (showStartScreen) {
+                    // 排除方向鍵，因為它們用於遊戲控制
+                    if (event.key.startsWith('Arrow')) {
+                        return;
+                    }
+                    startGame();
+                }
+            });
         }
         
         // 添加隨機方塊 (90% 機率為 2，10% 機率為 4)
@@ -649,6 +847,21 @@
                 localStorage.setItem('2048-bestScore', bestScore);
                 bestScoreElement.textContent = bestScore;
             }
+            
+            // 更新最低分（只在遊戲結束時）
+            if (isGameOver) {
+                updateWorstScore();
+            }
+        }
+        
+        // 更新最低分
+        function updateWorstScore() {
+            // 如果是第一次記錄最低分，或者當前分數低於最低分
+            if (worstScore === 0 || (score < worstScore && score > 0)) {
+                worstScore = score;
+                localStorage.setItem('2048-worstScore', worstScore);
+                worstScoreElement.textContent = worstScore;
+            }
         }
         
         // 繼續遊戲（在達到2048後）
@@ -658,6 +871,9 @@
         
         // 鍵盤事件監聽
         document.addEventListener('keydown', function(event) {
+            // 如果顯示開始畫面，不處理遊戲控制
+            if (showStartScreen) return;
+            
             if (gameOver && !won) return;
             
             switch(event.key) {
@@ -730,7 +946,16 @@
         }, {passive: false});
         
         // 按鈕事件監聽
-        restartButton.addEventListener('click', initGame);
+        restartButton.addEventListener('click', function() {
+            // 重新開始遊戲時顯示開始畫面
+            showStartScreen = true;
+            const startScreen = document.getElementById('start-screen');
+            if (startScreen) {
+                startScreen.style.display = 'flex';
+            }
+            document.querySelector('.container').style.opacity = '0.3';
+        });
+        
         keepPlayingButton.addEventListener('click', keepPlaying);
         
         // 初始化遊戲
