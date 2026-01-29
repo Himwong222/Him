@@ -224,6 +224,77 @@
             font-weight: bold;
         }
         
+        /* 開始畫面樣式 */
+        .start-screen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 3px solid #4CAF50;
+            box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
+            z-index: 20;
+            width: 90%;
+            max-width: 600px;
+            animation: pulse 2s infinite;
+        }
+        
+        .game-title {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            color: #4CAF50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 3px;
+            font-weight: bold;
+        }
+        
+        .game-subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #666;
+            font-weight: 600;
+        }
+        
+        .start-instruction {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            color: #333;
+            background: linear-gradient(90deg, #FF9800, #FF5722);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px dashed #FF9800;
+        }
+        
+        .start-hint {
+            font-size: 1.2rem;
+            color: #666;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                box-shadow: 0 0 60px rgba(76, 175, 80, 0.6);
+                transform: translate(-50%, -50%) scale(1.02);
+            }
+            100% {
+                box-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
         @media (max-width: 600px) {
             .game-container {
                 width: 95%;
@@ -240,6 +311,23 @@
             
             .stats {
                 font-size: 1rem;
+            }
+            
+            .start-screen {
+                padding: 25px;
+                width: 95%;
+            }
+            
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .game-subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .start-instruction {
+                font-size: 1.2rem;
             }
         }
     </style>
@@ -260,6 +348,13 @@
                 <button class="difficulty-btn" data-difficulty="normal">普通</button>
                 <button class="difficulty-btn" data-difficulty="hard">困難</button>
             </div>
+        </div>
+        
+        <div class="start-screen" id="startScreen">
+            <h2 class="game-title">Google Dinosaur</h2>
+            <div class="game-subtitle">恐龍遊戲</div>
+            <div class="start-instruction">按任意鍵開始遊戲</div>
+            <div class="start-hint">或點擊下方按鈕</div>
         </div>
         
         <canvas id="gameCanvas" width="800" height="300"></canvas>
@@ -313,6 +408,7 @@
         const gameOverScreen = document.getElementById('gameOver');
         const gameFeedback = document.getElementById('gameFeedback');
         const newHighScoreMessage = document.getElementById('newHighScoreMessage');
+        const startScreen = document.getElementById('startScreen');
         const startBtn = document.getElementById('startBtn');
         const jumpBtn = document.getElementById('jumpBtn');
         const resetBtn = document.getElementById('resetBtn');
@@ -641,11 +737,31 @@
             // 繪製粒子效果
             game.drawParticles();
             
-            // 繪製分數和難度
-            ctx.fillStyle = '#333';
-            ctx.font = '20px Arial';
-            ctx.fillText(`分數: ${score}`, 20, 30);
-            ctx.fillText(`難度: ${getDifficultyName(currentDifficulty)}`, 20, 60);
+            // 繪製分數和難度（更明顯的顯示）
+            // 分數背景
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(15, 5, 150, 60);
+            
+            // 分數文字
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'left';
+            ctx.shadowColor = '#000';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+            ctx.fillText(`分數: ${score}`, 20, 35);
+            
+            // 難度文字
+            ctx.fillStyle = '#4CAF50';
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText(`難度: ${getDifficultyName(currentDifficulty)}`, 20, 65);
+            
+            // 重置陰影
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
         }
         
         // 獲取難度名稱
@@ -698,7 +814,7 @@
                 // 移除超出畫面的障礙物
                 if (obstacle.x + obstacle.width < 0) {
                     obstacles.splice(index, 1);
-                    safeScoreIncrement(10);
+                    safeScoreIncrement(20); // 改為每次加20分
                     // 播放得分音效
                     game.audio.play('score');
                     
@@ -753,6 +869,9 @@
             }
             if (gameRunning) return;
             
+            // 隱藏開始畫面
+            startScreen.style.display = 'none';
+            
             initGame();
             gameRunning = true;
             gameLoop = setInterval(gameTick, 1000/60);
@@ -773,6 +892,9 @@
             game.clearParticles();
             initGame();
             draw();
+            
+            // 顯示開始畫面
+            startScreen.style.display = 'block';
         }
         
         // 獲取遊戲結束回饋
@@ -856,6 +978,10 @@
                     jump();
                 }
                 e.preventDefault();
+            } else if (!gameRunning && startScreen.style.display !== 'none') {
+                // 按任意鍵開始遊戲（當開始畫面顯示時）
+                startGame();
+                e.preventDefault();
             }
         });
         
@@ -882,6 +1008,9 @@
         loadHighScore();
         initGame();
         draw();
+        
+        // 確保開始畫面顯示
+        startScreen.style.display = 'block';
     </script>
 </body>
 </html> 
